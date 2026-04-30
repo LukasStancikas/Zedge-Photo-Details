@@ -1,0 +1,5 @@
+<resources>
+
+    <style name="Theme.ZedgePhotosDetails"
+        parent="Theme.MaterialComponents.Light.NoActionBar" />
+</resources>
