@@ -24,4 +24,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "Zedge-Photos-Details"
 include(":app")
+include(":core:common")
+include(":core:network")
+include(":core:ui")
+include(":core:domain")
+include(":core:database")
+include(":core:data")
+include(":feature:photolist")
+include(":feature:photodetails")
  

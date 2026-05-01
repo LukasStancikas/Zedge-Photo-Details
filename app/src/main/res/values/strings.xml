@@ -1,5 +1,3 @@
 <resources>
     <string name="app_name">Zedge-Photos-Details</string>
-    <string name="list_title">Zedge Photos</string>
-    <string name="error_message_unknown">Unknown Error</string>
 </resources>
