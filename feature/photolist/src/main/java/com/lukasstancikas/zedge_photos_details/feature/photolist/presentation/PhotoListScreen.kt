@@ -3,7 +3,6 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,11 +24,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.ui.FullScreenScaffold
-import com.lukasstancikas.zedge_photos_details.core.ui.LoadableContent
+import com.lukasstancikas.zedge_photos_details.core.ui.ReloadableContent
 import com.lukasstancikas.zedge_photos_details.feature.photolist.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,16 +39,13 @@ fun PhotoListScreen(
     FullScreenScaffold(
         title = stringResource(R.string.list_title),
         content = { paddingValues ->
-            LoadableContent(
+            ReloadableContent(
                 loadable = uiState.photos,
                 onRetry = { viewModel.fetchPhotos() },
+                onRefresh = { viewModel.onRefresh() },
                 modifier = Modifier.padding(paddingValues)
             ) { photos ->
-                PhotoListContent(
-                    photos = photos,
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = { viewModel.onRefresh() }
-                )
+                PhotoListContent(photos = photos)
             }
         }
     )
@@ -61,20 +55,11 @@ fun PhotoListScreen(
 @Composable
 fun PhotoListContent(
     photos: List<Photo>,
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit
+    modifier: Modifier = Modifier
 ) {
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
-        state = rememberPullToRefreshState(),
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            items(photos) { photo ->
-                PhotoItem(photo = photo)
-            }
+    LazyColumn(modifier = modifier) {
+        items(photos) { photo ->
+            PhotoItem(photo = photo)
         }
     }
 }

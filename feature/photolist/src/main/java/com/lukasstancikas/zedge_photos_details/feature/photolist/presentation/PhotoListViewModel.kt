@@ -2,8 +2,8 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
+import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,15 +34,10 @@ class PhotoListViewModel @Inject constructor(
 
     fun onRefresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true) }
+            _uiState.update { it.copy(photos = Loadable.Loading) }
             repository.clearPhotos()
             val result = repository.getPhotos(page = 1, limit = 20)
-            _uiState.update {
-                it.copy(
-                    isRefreshing = false,
-                    photos = result
-                )
-            }
+            _uiState.update { it.copy(photos = result) }
         }
     }
 }
