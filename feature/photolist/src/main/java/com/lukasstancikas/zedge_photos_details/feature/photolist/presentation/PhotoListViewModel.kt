@@ -30,7 +30,7 @@ class PhotoListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PhotoListUiState())
     val uiState: StateFlow<PhotoListUiState> = _uiState.asStateFlow()
         .onStart {
-            action(PhotoListAction.LoadPhotos)
+            fetchCurrentPhotos()
             observePhotos()
         }
         .stateIn(
@@ -62,9 +62,9 @@ class PhotoListViewModel @Inject constructor(
 
     fun action(action: PhotoListAction) {
         when (action) {
-            is PhotoListAction.LoadPhotos -> fetchPhotos(isRefresh = false)
+            is PhotoListAction.LoadPhotos -> fetchCurrentPhotos()
             is PhotoListAction.LoadNextPage -> fetchNextPage()
-            is PhotoListAction.PullRefresh -> fetchPhotos(isRefresh = true)
+            is PhotoListAction.PullRefresh -> refreshPhotos()
             is PhotoListAction.ClearPhotos -> clearPhotos()
             is PhotoListAction.ToggleFavoritesFilter -> {
                 _uiState.update { it.copy(showFavoritesOnly = !it.showFavoritesOnly) }
@@ -78,15 +78,36 @@ class PhotoListViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPhotos(isRefresh: Boolean = false) {
+    // error cases:
+    // 1. pull refresh - show error dialog
+    // 2. initial load / retry, failed with no data in db - show error dialog
+    // 3. initial load / retry failed but db had some from previous sessions - Toast
+    // 4. next page load failed - Toast
+
+    private fun refreshPhotos() {
+        if (uiState.value.showFavoritesOnly) return
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    photos = Loadable.Loading,
+                    currentPage = 1,
+                    isNextPageLoading = false
+                )
+            }
+
+            val result = repository.loadPhotoPage(page = 1)
+
+            if (result is Loadable.Error) {
+                _uiState.update { it.copy(photos = result) }
+            }
+        }
+    }
+
+    private fun fetchCurrentPhotos() {
         if (uiState.value.showFavoritesOnly) return
 
         viewModelScope.launch {
-            val pageToLoad = if (isRefresh) {
-                1
-            } else {
-                _uiState.value.currentPage
-            }
+            val pageToLoad = _uiState.value.currentPage
 
             _uiState.update {
                 it.copy(
@@ -97,9 +118,20 @@ class PhotoListViewModel @Inject constructor(
             }
 
             val result = repository.loadPhotoPage(page = pageToLoad)
-            _uiState.update { it.copy(isNextPageLoading = false) }
+
             if (result is Loadable.Error) {
-                _uiState.update { it.copy(photos = result) }
+                val noCachedPhotos =
+                    (_uiState.value.photos as? Loadable.Success)?.data.isNullOrEmpty()
+
+                if (!noCachedPhotos) {
+                    _effect.send(
+                        PhotoListEffect.ShowErrorToast(
+                            result.throwable.message ?: "Unknown error"
+                        )
+                    )
+                } else {
+                    _uiState.update { it.copy(photos = result) }
+                }
             }
         }
     }
@@ -113,14 +145,17 @@ class PhotoListViewModel @Inject constructor(
             val result = repository.loadPhotoPage(page = nextPage)
             _uiState.update { it.copy(isNextPageLoading = false) }
             if (result is Loadable.Error) {
-                // report error as a dialog
-                _uiState.update { it.copy(photos = result) }
+                // partial update show toast
+                _effect.send(
+                    PhotoListEffect.ShowErrorToast(
+                        result.throwable.message ?: "Unknown error"
+                    )
+                )
             } else {
                 _uiState.update { it.copy(currentPage = nextPage) }
             }
         }
     }
-
 
     private fun clearPhotos() {
         viewModelScope.launch {
