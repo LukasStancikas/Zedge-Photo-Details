@@ -126,7 +126,7 @@ class PhotoListViewModel @Inject constructor(
                 if (!noCachedPhotos) {
                     _effect.send(
                         PhotoListEffect.ShowErrorToast(
-                            result.throwable.message ?: "Unknown error"
+                            result.throwable.message.orEmpty()
                         )
                     )
                 } else {
@@ -148,7 +148,7 @@ class PhotoListViewModel @Inject constructor(
                 // partial update show toast
                 _effect.send(
                     PhotoListEffect.ShowErrorToast(
-                        result.throwable.message ?: "Unknown error"
+                        result.throwable.message.orEmpty()
                     )
                 )
             } else {

@@ -31,7 +31,6 @@ class PhotoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loadPhotoPage(page: Int): Loadable<Unit> {
-        delay(3000)
         val networkResult = api.getPhotos(page, 4).mapAll { it.toDomain() }
         return if (networkResult is Loadable.Success) {
             try {
@@ -48,36 +47,6 @@ class PhotoRepositoryImpl @Inject constructor(
             networkResult.map { }
         }
     }
-
-//    override suspend fun getPhotos(page: Int, limit: Int): Loadable<List<Photo>> {
-//        delay(3000)
-//        val networkResult = api.getPhotos(page, limit).mapAll { it.toDomain() }
-//
-//        return if (networkResult is Loadable.Success) {
-//            try {
-//                // When saving to DB, we use upsert to preserve isFavorite status automatically
-//                val ids = dao.upsertPhotosPreservingFavorite(
-//                    networkResult.data.map { it.toEntity() }
-//                )
-//
-//                // Fetch updated entities to get the correct isFavorite status
-//                val updatedEntities = dao.getPhotosByIds(ids)
-//                Loadable.Success(updatedEntities.map { it.toDomain() })
-//            } catch (e: Exception) {
-//                // don't fail if network succeeded but DB insertion failed
-//                e.printStackTrace()
-//                networkResult
-//            }
-//        } else {
-//            try {
-//                val cachedPhotos = dao.getPhotos()
-//                Loadable.Success(cachedPhotos.map { it.toDomain() })
-//            } catch (e: Exception) {
-//                Loadable.Error(e)
-//            }
-//        }
-//    }
-
 
     override suspend fun getPhoto(id: String): Loadable<Photo> {
         return try {

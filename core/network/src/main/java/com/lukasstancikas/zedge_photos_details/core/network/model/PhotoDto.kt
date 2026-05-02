@@ -10,5 +10,5 @@ data class PhotoDto(
     val width: Int,
     val height: Int,
     val url: String,
-    @Json(name = "download_url") val downloadUrl: String
+    @param:Json(name = "download_url") val downloadUrl: String
 )

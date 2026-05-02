@@ -19,9 +19,6 @@ interface PhotoDao {
     @Query("SELECT * FROM photos WHERE isFavorite = 1")
     fun getFavoritePhotosFlow(): Flow<List<PhotoEntity>>
 
-    @Query("SELECT * FROM photos")
-    suspend fun getPhotos(): List<PhotoEntity>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPhotosIgnore(photos: List<PhotoEntity>)
 
@@ -40,9 +37,6 @@ interface PhotoDao {
 
     @Query("SELECT * FROM photos WHERE id = :id")
     suspend fun getPhoto(id: String): PhotoEntity?
-
-    @Query("SELECT * FROM photos WHERE id IN (:ids)")
-    suspend fun getPhotosByIds(ids: List<String>): List<PhotoEntity>
 
     @Query("UPDATE photos SET isFavorite = :isFavorite WHERE id = :id")
     suspend fun updateFavoriteStatus(id: String, isFavorite: Boolean)
