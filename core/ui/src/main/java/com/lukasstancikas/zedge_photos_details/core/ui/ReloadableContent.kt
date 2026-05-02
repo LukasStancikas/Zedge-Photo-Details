@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -75,7 +76,7 @@ fun <T> LoadableContent(
     when (loadable) {
         is Loadable.Error -> {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -133,7 +134,7 @@ private fun ReloadableContentErrorPreview() {
     ZedgePhotosDetailsTheme {
         ReloadableContent(
             loadable = Loadable.Error(
-                Throwable(stringResource(R.string.generic_error_something_went_wrong))
+                Throwable("Unable to resolve host TEST. No address and text is long")
             ),
             onRetry = {},
             onRefresh = {},
