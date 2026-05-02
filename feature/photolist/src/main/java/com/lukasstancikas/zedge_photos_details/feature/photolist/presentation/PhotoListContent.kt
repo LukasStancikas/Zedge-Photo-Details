@@ -3,6 +3,7 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,9 +37,14 @@ import com.lukasstancikas.zedge_photos_details.feature.photolist.R
 fun PhotoListContent(
     photos: List<Photo>,
     onPhotoClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize(),
+        contentPadding = contentPadding
+    ) {
         items(photos) { photo ->
             PhotoItem(
                 photo = photo,

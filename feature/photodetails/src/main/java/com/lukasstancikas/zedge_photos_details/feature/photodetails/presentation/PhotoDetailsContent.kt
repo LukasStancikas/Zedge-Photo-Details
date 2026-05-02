@@ -2,10 +2,13 @@ package com.lukasstancikas.zedge_photos_details.feature.photodetails.presentatio
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,11 +30,14 @@ import com.lukasstancikas.zedge_photos_details.feature.photodetails.R
 @Composable
 fun PhotoDetailsContent(
     photo: Photo,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
             .padding(start = 16.dp, end = 16.dp)
     ) {
         GlideImage(
@@ -80,7 +86,7 @@ fun PhotoDetailsContentPreview() {
                 height = 3333,
                 url = "https://unsplash.com/photos/LNR_chXmC6c",
                 downloadUrl = "https://picsum.photos/id/0/5000/3333"
-            )
+            ),
         )
     }
 }
