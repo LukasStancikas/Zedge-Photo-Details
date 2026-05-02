@@ -9,13 +9,18 @@ import androidx.room.Update
 import com.lukasstancikas.zedge_photos_details.core.database.model.PhotoEntity
 import com.lukasstancikas.zedge_photos_details.core.database.model.PhotoMetadata
 
+import kotlinx.coroutines.flow.Flow
+
 @Dao
 interface PhotoDao {
     @Query("SELECT * FROM photos")
-    suspend fun getPhotos(): List<PhotoEntity>
+    fun getPhotosFlow(): Flow<List<PhotoEntity>>
 
     @Query("SELECT * FROM photos WHERE isFavorite = 1")
-    suspend fun getFavoritePhotos(): List<PhotoEntity>
+    fun getFavoritePhotosFlow(): Flow<List<PhotoEntity>>
+
+    @Query("SELECT * FROM photos")
+    suspend fun getPhotos(): List<PhotoEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPhotosIgnore(photos: List<PhotoEntity>)

@@ -5,15 +5,20 @@ import androidx.lifecycle.viewModelScope
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
     private val repository: PhotoRepository
@@ -26,7 +31,26 @@ class PhotoListViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
+        observePhotos()
         action(PhotoListAction.LoadPhotos)
+    }
+
+    private fun observePhotos() {
+        viewModelScope.launch {
+            _uiState
+                .map { it.showFavoritesOnly }
+                .distinctUntilChanged()
+                .flatMapLatest { favoritesOnly ->
+                    if (favoritesOnly) {
+                        repository.getFavoritePhotosFlow()
+                    } else {
+                        repository.getPhotosFlow()
+                    }
+                }
+                .collect { photos ->
+                    _uiState.update { it.copy(photos = Loadable.Success(photos)) }
+                }
+        }
     }
 
     fun action(action: PhotoListAction) {
@@ -36,8 +60,8 @@ class PhotoListViewModel @Inject constructor(
             is PhotoListAction.ClearPhotos -> clearPhotos()
             is PhotoListAction.ToggleFavoritesFilter -> {
                 _uiState.update { it.copy(showFavoritesOnly = !it.showFavoritesOnly) }
-                fetchPhotos()
             }
+
             is PhotoListAction.PhotoClicked -> {
                 viewModelScope.launch {
                     _effect.send(PhotoListEffect.NavigateToDetails(action.photoId))
@@ -49,33 +73,18 @@ class PhotoListViewModel @Inject constructor(
     private fun fetchPhotos() {
         viewModelScope.launch {
             _uiState.update { it.copy(photos = Loadable.Loading) }
-            val photosResult = if (_uiState.value.showFavoritesOnly) {
-                repository.getFavoritePhotos()
-            } else {
-                repository.getPhotos(page = 1, limit = 20)
-            }
-            _uiState.update { it.copy(photos = photosResult) }
+            val result = repository.getPhotos(page = 1, limit = 20)
+            _uiState.update { it.copy(photos = result) }
         }
     }
 
     private fun onRefresh() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(photos = Loadable.Loading) }
-            val result = if (_uiState.value.showFavoritesOnly) {
-                repository.getFavoritePhotos()
-            } else {
-                repository.getPhotos(page = 1, limit = 20)
-            }
-            _uiState.update { it.copy(photos = result) }
-        }
+        fetchPhotos()
     }
-    
+
     private fun clearPhotos() {
         viewModelScope.launch {
-            _uiState.update { it.copy(photos = Loadable.Loading) }
             repository.clearPhotos()
-            _uiState.update { it.copy(photos = Loadable.Success(emptyList())) }
         }
     }
 }
-

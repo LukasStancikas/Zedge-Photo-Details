@@ -54,6 +54,7 @@ fun PhotoListScreen(
         content = { systemBars ->
             ReloadableContent(
                 loadable = uiState.photos,
+                isEnabled = !uiState.showFavoritesOnly,
                 onRetry = { viewModel.action(PhotoListAction.LoadPhotos) },
                 onRefresh = { viewModel.action(PhotoListAction.Refresh) },
             ) { photos ->

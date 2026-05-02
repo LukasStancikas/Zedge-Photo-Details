@@ -8,12 +8,26 @@ import com.lukasstancikas.zedge_photos_details.core.database.dao.PhotoDao
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import com.lukasstancikas.zedge_photos_details.core.network.PicsumApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PhotoRepositoryImpl @Inject constructor(
     private val api: PicsumApi,
     private val dao: PhotoDao
 ) : PhotoRepository {
+
+    override fun getPhotosFlow(): Flow<List<Photo>> {
+        return dao.getPhotosFlow().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override fun getFavoritePhotosFlow(): Flow<List<Photo>> {
+        return dao.getFavoritePhotosFlow().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
 
     override suspend fun getPhotos(page: Int, limit: Int): Loadable<List<Photo>> {
         val networkResult = api.getPhotos(page, limit).mapAll { it.toDomain() }
@@ -43,14 +57,6 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getFavoritePhotos(): Loadable<List<Photo>> {
-        return try {
-            val favorites = dao.getFavoritePhotos()
-            Loadable.Success(favorites.map { it.toDomain() })
-        } catch (e: Exception) {
-            Loadable.Error(e)
-        }
-    }
 
     override suspend fun getPhoto(id: String): Loadable<Photo> {
         return try {

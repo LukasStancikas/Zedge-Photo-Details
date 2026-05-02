@@ -53,12 +53,13 @@ fun PhotoDetailsScreen(
             LoadableContent(
                 loadable = uiState.photo,
                 onRetry = { viewModel.action(PhotoDetailsAction.LoadPhoto) },
-            ) { photo ->
-                PhotoDetailsContent(
-                    photo = photo,
-                    contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding())
-                )
-            }
+                content = { photo ->
+                    PhotoDetailsContent(
+                        photo = photo,
+                        contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding())
+                    )
+                }
+            )
         }
     )
 }
