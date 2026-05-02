@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,14 +28,18 @@ class PhotoListViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PhotoListUiState())
     val uiState: StateFlow<PhotoListUiState> = _uiState.asStateFlow()
+        .onStart {
+            action(PhotoListAction.LoadPhotos)
+            observePhotos()
+        }
+        .stateIn(
+            viewModelScope,
+            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+            initialValue = _uiState.value
+        )
 
     private val _effect = Channel<PhotoListEffect>()
     val effect = _effect.receiveAsFlow()
-
-    init {
-        observePhotos()
-        action(PhotoListAction.LoadPhotos)
-    }
 
     private fun observePhotos() {
         viewModelScope.launch {
