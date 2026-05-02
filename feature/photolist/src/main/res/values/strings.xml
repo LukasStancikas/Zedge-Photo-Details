@@ -3,4 +3,7 @@
     <string name="menu_clear_photos">Clear photos</string>
     <string name="photo_fake_description">A beautiful photo by %1$s exploring %2$dx%3$d dimensions.</string>
     <string name="photo_content_description">Photo by %1$s</string>
+    <string name="photo_is_favorite">Favorite: %1$s</string>
+    <string name="generic_yes">Yes</string>
+    <string name="generic_no">No</string>
 </resources>

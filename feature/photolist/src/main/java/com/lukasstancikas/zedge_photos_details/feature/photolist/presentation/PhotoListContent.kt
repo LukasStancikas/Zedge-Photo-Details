@@ -97,6 +97,18 @@ fun PhotoItem(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                val isFavoriteText = if (photo.isFavorite) {
+                    stringResource(R.string.generic_yes)
+                } else {
+                    stringResource(R.string.generic_no)
+                }
+                Text(
+                    text = stringResource(R.string.photo_is_favorite, isFavoriteText),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(
                         R.string.photo_fake_description,
@@ -124,7 +136,8 @@ fun PhotoListContentPreview() {
                     width = 5000,
                     height = 3333,
                     url = "https://unsplash.com/photos/LNR_chXmC6c",
-                    downloadUrl = "https://picsum.photos/id/0/5000/3333"
+                    downloadUrl = "https://picsum.photos/id/0/5000/3333",
+                    isFavorite = true
                 ),
                 Photo(
                     id = "2",
