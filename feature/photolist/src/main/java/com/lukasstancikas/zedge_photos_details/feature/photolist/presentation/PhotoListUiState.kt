@@ -5,4 +5,5 @@ import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 
 data class PhotoListUiState(
     val photos: Loadable<List<Photo>> = Loadable.Loading,
+    val showFavoritesOnly: Boolean = false,
 )

@@ -43,6 +43,15 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getFavoritePhotos(): Loadable<List<Photo>> {
+        return try {
+            val favorites = dao.getFavoritePhotos()
+            Loadable.Success(favorites.map { it.toDomain() })
+        } catch (e: Exception) {
+            Loadable.Error(e)
+        }
+    }
+
     override suspend fun getPhoto(id: String): Loadable<Photo> {
         return try {
             val entity = dao.getPhoto(id)

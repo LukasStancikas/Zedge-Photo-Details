@@ -34,6 +34,10 @@ class PhotoListViewModel @Inject constructor(
             is PhotoListAction.LoadPhotos -> fetchPhotos()
             is PhotoListAction.Refresh -> onRefresh()
             is PhotoListAction.ClearPhotos -> clearPhotos()
+            is PhotoListAction.ToggleFavoritesFilter -> {
+                _uiState.update { it.copy(showFavoritesOnly = !it.showFavoritesOnly) }
+                fetchPhotos()
+            }
             is PhotoListAction.PhotoClicked -> {
                 viewModelScope.launch {
                     _effect.send(PhotoListEffect.NavigateToDetails(action.photoId))
@@ -45,7 +49,11 @@ class PhotoListViewModel @Inject constructor(
     private fun fetchPhotos() {
         viewModelScope.launch {
             _uiState.update { it.copy(photos = Loadable.Loading) }
-            val photosResult = repository.getPhotos(page = 1, limit = 20)
+            val photosResult = if (_uiState.value.showFavoritesOnly) {
+                repository.getFavoritePhotos()
+            } else {
+                repository.getPhotos(page = 1, limit = 20)
+            }
             _uiState.update { it.copy(photos = photosResult) }
         }
     }
@@ -53,7 +61,11 @@ class PhotoListViewModel @Inject constructor(
     private fun onRefresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(photos = Loadable.Loading) }
-            val result = repository.getPhotos(page = 1, limit = 20)
+            val result = if (_uiState.value.showFavoritesOnly) {
+                repository.getFavoritePhotos()
+            } else {
+                repository.getPhotos(page = 1, limit = 20)
+            }
             _uiState.update { it.copy(photos = result) }
         }
     }

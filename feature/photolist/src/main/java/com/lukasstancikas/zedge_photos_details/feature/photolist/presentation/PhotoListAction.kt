@@ -4,5 +4,6 @@ sealed interface PhotoListAction {
     data object ClearPhotos : PhotoListAction
     data object LoadPhotos : PhotoListAction
     data object Refresh : PhotoListAction
+    data object ToggleFavoritesFilter : PhotoListAction
     data class PhotoClicked(val photoId: String) : PhotoListAction
 }

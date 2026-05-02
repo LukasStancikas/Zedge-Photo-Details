@@ -3,6 +3,8 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +38,12 @@ fun PhotoListScreen(
     FullScreenScaffold(
         title = stringResource(R.string.list_title),
         actions = {
+            IconButton(onClick = { viewModel.action(PhotoListAction.ToggleFavoritesFilter) }) {
+                Icon(
+                    imageVector = if (uiState.showFavoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = stringResource(R.string.menu_favorites_filter)
+                )
+            }
             IconButton(onClick = { viewModel.action(PhotoListAction.ClearPhotos) }) {
                 Icon(
                     imageVector = Icons.Default.Delete,

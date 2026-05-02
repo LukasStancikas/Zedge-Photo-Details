@@ -14,6 +14,9 @@ interface PhotoDao {
     @Query("SELECT * FROM photos")
     suspend fun getPhotos(): List<PhotoEntity>
 
+    @Query("SELECT * FROM photos WHERE isFavorite = 1")
+    suspend fun getFavoritePhotos(): List<PhotoEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPhotosIgnore(photos: List<PhotoEntity>)
 
