@@ -33,10 +33,10 @@ class PhotoDetailsViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        handleAction(PhotoDetailsAction.LoadPhoto)
+        action(PhotoDetailsAction.LoadPhoto)
     }
 
-    fun handleAction(action: PhotoDetailsAction) {
+    fun action(action: PhotoDetailsAction) {
         when (action) {
             PhotoDetailsAction.LoadPhoto -> loadPhoto()
             PhotoDetailsAction.ToggleFavorite -> toggleFavorite()

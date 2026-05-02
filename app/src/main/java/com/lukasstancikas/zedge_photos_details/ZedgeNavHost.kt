@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lukasstancikas.zedge_photos_details.core.common.navigation.PhotoDetailsDestination
 import com.lukasstancikas.zedge_photos_details.core.common.navigation.PhotoListDestination
-import com.lukasstancikas.zedge_photos_details.feature.photodetails.presentation.PhotoDetailsRoute
+import com.lukasstancikas.zedge_photos_details.feature.photodetails.presentation.PhotoDetailsScreen
 import com.lukasstancikas.zedge_photos_details.feature.photolist.presentation.PhotoListScreen
 
 @Composable
@@ -24,7 +24,7 @@ fun ZedgeNavHost() {
             )
         }
         composable<PhotoDetailsDestination> {
-            PhotoDetailsRoute(
+            PhotoDetailsScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }

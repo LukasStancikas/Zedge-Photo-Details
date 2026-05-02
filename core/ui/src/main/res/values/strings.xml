@@ -1,3 +1,4 @@
 <resources>
     <string name="error_message_unknown">Unknown Error</string>
+    <string name="generic_error_something_went_wrong">Something went wrong</string>
 </resources>

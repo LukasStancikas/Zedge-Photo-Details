@@ -43,4 +43,5 @@ dependencies {
     
     implementation(libs.glide.compose)
     implementation(libs.kotlinx.serialization.json)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }

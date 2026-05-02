@@ -21,12 +21,18 @@ class PhotoRepositoryImpl @Inject constructor(
         return if (networkResult is Loadable.Success) {
             try {
                 // When saving to DB, we use upsert to preserve isFavorite status automatically
-                dao.upsertPhotosPreservingFavorite(networkResult.data.map { it.toEntity() })
+                val ids = dao.upsertPhotosPreservingFavorite(
+                    networkResult.data.map { it.toEntity() }
+                )
+
+                // Fetch updated entities to get the correct isFavorite status
+                val updatedEntities = dao.getPhotosByIds(ids)
+                Loadable.Success(updatedEntities.map { it.toDomain() })
             } catch (e: Exception) {
                 // don't fail if network succeeded but DB insertion failed
                 e.printStackTrace()
+                networkResult
             }
-            networkResult
         } else {
             try {
                 val cachedPhotos = dao.getPhotos()

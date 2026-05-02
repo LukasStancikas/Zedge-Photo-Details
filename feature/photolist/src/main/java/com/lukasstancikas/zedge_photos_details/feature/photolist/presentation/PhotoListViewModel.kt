@@ -33,6 +33,7 @@ class PhotoListViewModel @Inject constructor(
         when (action) {
             is PhotoListAction.LoadPhotos -> fetchPhotos()
             is PhotoListAction.Refresh -> onRefresh()
+            is PhotoListAction.ClearPhotos -> clearPhotos()
             is PhotoListAction.PhotoClicked -> {
                 viewModelScope.launch {
                     _effect.send(PhotoListEffect.NavigateToDetails(action.photoId))
@@ -52,9 +53,16 @@ class PhotoListViewModel @Inject constructor(
     private fun onRefresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(photos = Loadable.Loading) }
-            repository.clearPhotos()
             val result = repository.getPhotos(page = 1, limit = 20)
             _uiState.update { it.copy(photos = result) }
+        }
+    }
+    
+    private fun clearPhotos() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(photos = Loadable.Loading) }
+            repository.clearPhotos()
+            _uiState.update { it.copy(photos = Loadable.Success(emptyList())) }
         }
     }
 }

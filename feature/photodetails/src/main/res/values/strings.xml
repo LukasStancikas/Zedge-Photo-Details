@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_photo">Share photo URL</string>
+    <string name="title_photo_details">Photo Details</string>
+    <string name="menu_back">Back</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_favorites_remove">Remove from favorites</string>
+    <string name="menu_favorites_add">Add to favorites</string>
+    <string name="photo_details_photo_by">Photo by %1$s</string>
+    <string name="photo_details_author">Author: %1$s</string>
+    <string name="photo_details_dimensions">Dimensions: %1$d x %2$d</string>
+    <string name="photo_details_original_url">Original URL: %1$s</string>
+</resources>
