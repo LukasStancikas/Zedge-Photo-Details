@@ -8,6 +8,7 @@ import com.lukasstancikas.zedge_photos_details.core.database.dao.PhotoDao
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import com.lukasstancikas.zedge_photos_details.core.network.PicsumApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -29,33 +30,53 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPhotos(page: Int, limit: Int): Loadable<List<Photo>> {
-        val networkResult = api.getPhotos(page, limit).mapAll { it.toDomain() }
-
+    override suspend fun loadPhotoPage(page: Int): Loadable<Unit> {
+        delay(3000)
+        val networkResult = api.getPhotos(page, 4).mapAll { it.toDomain() }
         return if (networkResult is Loadable.Success) {
             try {
                 // When saving to DB, we use upsert to preserve isFavorite status automatically
-                val ids = dao.upsertPhotosPreservingFavorite(
+                dao.upsertPhotosPreservingFavorite(
                     networkResult.data.map { it.toEntity() }
                 )
-
-                // Fetch updated entities to get the correct isFavorite status
-                val updatedEntities = dao.getPhotosByIds(ids)
-                Loadable.Success(updatedEntities.map { it.toDomain() })
+                Loadable.Success(Unit)
             } catch (e: Exception) {
-                // don't fail if network succeeded but DB insertion failed
                 e.printStackTrace()
-                networkResult
-            }
-        } else {
-            try {
-                val cachedPhotos = dao.getPhotos()
-                Loadable.Success(cachedPhotos.map { it.toDomain() })
-            } catch (e: Exception) {
                 Loadable.Error(e)
             }
+        } else {
+            networkResult.map { }
         }
     }
+
+//    override suspend fun getPhotos(page: Int, limit: Int): Loadable<List<Photo>> {
+//        delay(3000)
+//        val networkResult = api.getPhotos(page, limit).mapAll { it.toDomain() }
+//
+//        return if (networkResult is Loadable.Success) {
+//            try {
+//                // When saving to DB, we use upsert to preserve isFavorite status automatically
+//                val ids = dao.upsertPhotosPreservingFavorite(
+//                    networkResult.data.map { it.toEntity() }
+//                )
+//
+//                // Fetch updated entities to get the correct isFavorite status
+//                val updatedEntities = dao.getPhotosByIds(ids)
+//                Loadable.Success(updatedEntities.map { it.toDomain() })
+//            } catch (e: Exception) {
+//                // don't fail if network succeeded but DB insertion failed
+//                e.printStackTrace()
+//                networkResult
+//            }
+//        } else {
+//            try {
+//                val cachedPhotos = dao.getPhotos()
+//                Loadable.Success(cachedPhotos.map { it.toDomain() })
+//            } catch (e: Exception) {
+//                Loadable.Error(e)
+//            }
+//        }
+//    }
 
 
     override suspend fun getPhoto(id: String): Loadable<Photo> {

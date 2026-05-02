@@ -31,12 +31,11 @@ interface PhotoDao {
 
     // Use this for insertion, inserts missing photos, updates all photos data, except isFavorite
     @Transaction
-    suspend fun upsertPhotosPreservingFavorite(photos: List<PhotoEntity>): List<String> {
+    suspend fun upsertPhotosPreservingFavorite(photos: List<PhotoEntity>) {
         insertPhotosIgnore(photos)
         updatePhotosMetadata(photos.map {
             PhotoMetadata(it.id, it.author, it.width, it.height, it.url, it.downloadUrl)
         })
-        return photos.map { it.id }
     }
 
     @Query("SELECT * FROM photos WHERE id = :id")

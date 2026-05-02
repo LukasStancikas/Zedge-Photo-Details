@@ -18,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -37,8 +38,10 @@ import com.lukasstancikas.zedge_photos_details.feature.photolist.R
 fun PhotoListContent(
     photos: List<Photo>,
     onPhotoClick: (String) -> Unit,
+    onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues()
+    contentPadding: PaddingValues = PaddingValues(),
+    isNextPageLoading: Boolean = false
 ) {
     LazyColumn(
         modifier = modifier
@@ -50,6 +53,25 @@ fun PhotoListContent(
                 photo = photo,
                 onClick = { onPhotoClick(photo.id) }
             )
+            
+            if (photo == photos.last()) {
+                LaunchedEffect(photo.id) {
+                    onLoadNextPage()
+                }
+            }
+        }
+
+        if (isNextPageLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
@@ -148,7 +170,8 @@ fun PhotoListContentPreview() {
                     downloadUrl = "https://picsum.photos/id/10/2500/1667"
                 )
             ),
-            onPhotoClick = {}
+            onPhotoClick = {},
+            onLoadNextPage = {}
         )
     }
 }

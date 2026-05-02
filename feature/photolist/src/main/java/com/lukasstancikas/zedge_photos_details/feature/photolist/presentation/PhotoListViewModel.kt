@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,7 +35,7 @@ class PhotoListViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = _uiState.value
         )
 
@@ -61,8 +62,9 @@ class PhotoListViewModel @Inject constructor(
 
     fun action(action: PhotoListAction) {
         when (action) {
-            is PhotoListAction.LoadPhotos -> fetchPhotos()
-            is PhotoListAction.Refresh -> onRefresh()
+            is PhotoListAction.LoadPhotos -> fetchPhotos(isRefresh = false)
+            is PhotoListAction.LoadNextPage -> fetchNextPage()
+            is PhotoListAction.PullRefresh -> fetchPhotos(isRefresh = true)
             is PhotoListAction.ClearPhotos -> clearPhotos()
             is PhotoListAction.ToggleFavoritesFilter -> {
                 _uiState.update { it.copy(showFavoritesOnly = !it.showFavoritesOnly) }
@@ -76,21 +78,54 @@ class PhotoListViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPhotos() {
+    private fun fetchPhotos(isRefresh: Boolean = false) {
+        if (uiState.value.showFavoritesOnly) return
+
         viewModelScope.launch {
-            _uiState.update { it.copy(photos = Loadable.Loading) }
-            val result = repository.getPhotos(page = 1, limit = 20)
-            _uiState.update { it.copy(photos = result) }
+            val pageToLoad = if (isRefresh) {
+                1
+            } else {
+                _uiState.value.currentPage
+            }
+
+            _uiState.update {
+                it.copy(
+                    photos = Loadable.Loading,
+                    currentPage = pageToLoad,
+                    isNextPageLoading = false
+                )
+            }
+
+            val result = repository.loadPhotoPage(page = pageToLoad)
+            _uiState.update { it.copy(isNextPageLoading = false) }
+            if (result is Loadable.Error) {
+                _uiState.update { it.copy(photos = result) }
+            }
         }
     }
 
-    private fun onRefresh() {
-        fetchPhotos()
+    private fun fetchNextPage() {
+        if (uiState.value.showFavoritesOnly || uiState.value.isNextPageLoading) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isNextPageLoading = true) }
+            val nextPage = _uiState.value.currentPage + 1
+            val result = repository.loadPhotoPage(page = nextPage)
+            _uiState.update { it.copy(isNextPageLoading = false) }
+            if (result is Loadable.Error) {
+                // report error as a dialog
+                _uiState.update { it.copy(photos = result) }
+            } else {
+                _uiState.update { it.copy(currentPage = nextPage) }
+            }
+        }
     }
+
 
     private fun clearPhotos() {
         viewModelScope.launch {
             repository.clearPhotos()
+            _uiState.update { it.copy(currentPage = 1) }
         }
     }
 }

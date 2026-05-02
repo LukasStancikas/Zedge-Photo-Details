@@ -56,11 +56,13 @@ fun PhotoListScreen(
                 loadable = uiState.photos,
                 isEnabled = !uiState.showFavoritesOnly,
                 onRetry = { viewModel.action(PhotoListAction.LoadPhotos) },
-                onRefresh = { viewModel.action(PhotoListAction.Refresh) },
+                onRefresh = { viewModel.action(PhotoListAction.PullRefresh) },
             ) { photos ->
                 PhotoListContent(
                     photos = photos,
                     onPhotoClick = { viewModel.action(PhotoListAction.PhotoClicked(it)) },
+                    onLoadNextPage = { viewModel.action(PhotoListAction.LoadNextPage) },
+                    isNextPageLoading = uiState.isNextPageLoading,
                     contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding())
                 )
             }
