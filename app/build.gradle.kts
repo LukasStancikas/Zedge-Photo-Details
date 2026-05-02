@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -40,6 +41,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:domain"))
+    implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":feature:photolist"))
     implementation(project(":feature:photodetails"))
@@ -52,9 +54,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.material)
     
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     "ksp"(libs.hilt.compiler)
 
     testImplementation(libs.junit)

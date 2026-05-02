@@ -20,7 +20,8 @@ class PhotoRepositoryImpl @Inject constructor(
 
         return if (networkResult is Loadable.Success) {
             try {
-                dao.insertPhotos(networkResult.data.map { it.toEntity() })
+                // When saving to DB, we use upsert to preserve isFavorite status automatically
+                dao.upsertPhotosPreservingFavorite(networkResult.data.map { it.toEntity() })
             } catch (e: Exception) {
                 // don't fail if network succeeded but DB insertion failed
                 e.printStackTrace()
@@ -34,6 +35,23 @@ class PhotoRepositoryImpl @Inject constructor(
                 Loadable.Error(e)
             }
         }
+    }
+
+    override suspend fun getPhoto(id: String): Loadable<Photo> {
+        return try {
+            val entity = dao.getPhoto(id)
+            if (entity != null) {
+                Loadable.Success(entity.toDomain())
+            } else {
+                Loadable.Error(Exception("Photo not found"))
+            }
+        } catch (e: Exception) {
+            Loadable.Error(e)
+        }
+    }
+
+    override suspend fun toggleFavorite(id: String, isFavorite: Boolean) {
+        dao.updateFavoriteStatus(id, isFavorite)
     }
 
     override suspend fun clearPhotos() {

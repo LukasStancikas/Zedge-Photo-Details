@@ -22,7 +22,8 @@ object DatabaseModule {
         context,
         ZedgeDatabase::class.java,
         "zedge-database",
-    ).build()
+    ).fallbackToDestructiveMigration(dropAllTables = true)
+        .build()
 
     @Provides
     fun providePhotoDao(
