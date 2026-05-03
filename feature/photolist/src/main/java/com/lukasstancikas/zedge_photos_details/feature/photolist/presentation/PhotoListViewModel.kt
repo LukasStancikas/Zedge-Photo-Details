@@ -30,18 +30,14 @@ class PhotoListViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PhotoListUiState())
     val uiState: StateFlow<PhotoListUiState> = _uiState.asStateFlow()
-        .onStart {
-            fetchCurrentPhotos()
-            observePhotos()
-        }
-        .stateIn(
-            viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _uiState.value
-        )
 
     private val _effect = Channel<PhotoListEffect>()
     val effect = _effect.receiveAsFlow()
+
+    init {
+        observePhotos()
+        fetchCurrentPhotos()
+    }
 
     private fun observePhotos() {
         viewModelScope.launch {
@@ -156,6 +152,8 @@ class PhotoListViewModel @Inject constructor(
                 _uiState.update { it.copy(currentPage = nextPage) }
             }
         }
+
+
     }
 
     private fun clearPhotos() {

@@ -7,7 +7,9 @@ import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -129,7 +131,7 @@ class PhotoListViewModelTest {
             val refreshingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, refreshingState.photos)
 
-            // 2. Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow() 
+            // 2. Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow()
             // after repository.loadPhotoPage(page = 1)
             advanceUntilIdle()
             photosFlow.value = refreshedPhotos
@@ -150,9 +152,9 @@ class PhotoListViewModelTest {
     @Test
     fun `load next page success increments page`() = runTest {
         turbineScope {
-        val photos = listOf(createPhoto("1"))
-        whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
-        photosFlow.value = photos
+            val photos = listOf(createPhoto("1"))
+            whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
+            photosFlow.value = photos
 
             viewModel = PhotoListViewModel(repository)
             val stateTurbine = viewModel.uiState.testIn(this)
@@ -164,16 +166,14 @@ class PhotoListViewModelTest {
             assertTrue(initialSuccessState.photos is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
-
-            // 1. Shows next page is loading
+            // Page incremented and loading finished
             val nextPageLoadingState = stateTurbine.awaitItem()
-            assertTrue(nextPageLoadingState.isNextPageLoading)
+            assertTrue( nextPageLoadingState.isNextPageLoading)
+            val nextPageLoadedState = stateTurbine.awaitItem()
+            assertFalse(nextPageLoadedState.isNextPageLoading)
 
-            // 2. Page incremented and loading finished
             val nextPageSuccessState = stateTurbine.awaitItem()
-            assertFalse(nextPageSuccessState.isNextPageLoading)
             assertEquals(2, nextPageSuccessState.currentPage)
-
             verify(repository).loadPhotoPage(2)
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
@@ -187,35 +187,41 @@ class PhotoListViewModelTest {
         turbineScope {
             viewModel = PhotoListViewModel(repository)
             val stateTurbine = viewModel.uiState.testIn(this)
-            val effectTurbine = viewModel.effect.testIn(this)
+            val effects = Channel<PhotoListEffect>()
+            val results = mutableListOf<PhotoListUiState>()
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiState.collect {
+                    results.add(it)
+                }
+            }
 
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.effect.collect {
+                    effects.send(it)
+                }
+            }
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, initialLoadingState.photos)
 
-            advanceUntilIdle()
             val initialSuccessState = stateTurbine.awaitItem()
             assertTrue(initialSuccessState.photos is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
-
-            // 1. Paging starts
-            val pagingLoadingState = stateTurbine.awaitItem()
-            assertTrue(pagingLoadingState.isNextPageLoading)
-
             // 2. Effect emitted on failure
-            val effect = effectTurbine.awaitItem()
+            val effect = effects.receive()
             assertTrue(effect is PhotoListEffect.ShowErrorToast)
             assertEquals("Paging error", (effect as PhotoListEffect.ShowErrorToast).error)
 
-            // 3. Paging finished (back to false)
-            val finalState = stateTurbine.awaitItem()
-            assertFalse(finalState.isNextPageLoading)
+            // 3. Paging started (back to false)
+            val nextPageLoadingState = stateTurbine.awaitItem()
+            assertTrue(nextPageLoadingState.isNextPageLoading)
+            val nextPageLoadedState = stateTurbine.awaitItem()
+            assertFalse(nextPageLoadedState.isNextPageLoading)
 
             assertEquals(1, viewModel.uiState.value.currentPage)
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
-            effectTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 
