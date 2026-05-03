@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
-    private val repository: PhotoRepository
+    private val repository: PhotoRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PhotoListUiState())
