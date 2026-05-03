@@ -187,19 +187,7 @@ class PhotoListViewModelTest {
         turbineScope {
             viewModel = PhotoListViewModel(repository)
             val stateTurbine = viewModel.uiState.testIn(this)
-            val effects = Channel<PhotoListEffect>()
-            val results = mutableListOf<PhotoListUiState>()
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.uiState.collect {
-                    results.add(it)
-                }
-            }
-
-            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-                viewModel.effect.collect {
-                    effects.send(it)
-                }
-            }
+            val effectTurbine = viewModel.effect.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, initialLoadingState.photos)
@@ -209,7 +197,7 @@ class PhotoListViewModelTest {
 
             viewModel.action(PhotoListAction.LoadNextPage)
             // 2. Effect emitted on failure
-            val effect = effects.receive()
+            val effect = effectTurbine.awaitItem()
             assertTrue(effect is PhotoListEffect.ShowErrorToast)
             assertEquals("Paging error", (effect as PhotoListEffect.ShowErrorToast).error)
 
@@ -222,6 +210,7 @@ class PhotoListViewModelTest {
             assertEquals(1, viewModel.uiState.value.currentPage)
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
+            effectTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 

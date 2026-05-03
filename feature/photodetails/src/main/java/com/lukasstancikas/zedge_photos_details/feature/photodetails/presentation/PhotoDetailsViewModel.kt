@@ -33,7 +33,7 @@ class PhotoDetailsViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        action(PhotoDetailsAction.LoadPhoto)
+        loadPhoto()
     }
 
     fun action(action: PhotoDetailsAction) {

@@ -45,7 +45,7 @@ fun CollapsingTopAppBar(
     modifier: Modifier = Modifier,
     systemBarsPadding: PaddingValues = PaddingValues(),
     actions: @Composable RowScope.() -> Unit = {},
-    onBackClick: () -> Unit
+    onBackClick: (() -> Unit)? = null
 ) {
     val layoutDirection = LocalLayoutDirection.current
 
@@ -76,18 +76,20 @@ fun CollapsingTopAppBar(
         expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight + systemBarsPadding.calculateTopPadding(),
         windowInsets = WindowInsets(0),
         navigationIcon = {
-            IconButton(
-                onClick = onBackClick,
-                modifier = Modifier.padding(
-                    start = systemBarsPadding.calculateStartPadding(layoutDirection),
-                    top = systemBarsPadding.calculateTopPadding()
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    contentDescription = stringResource(R.string.menu_back)
-                )
+            onBackClick?.let {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.padding(
+                        start = systemBarsPadding.calculateStartPadding(layoutDirection),
+                        top = systemBarsPadding.calculateTopPadding()
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        contentDescription = stringResource(R.string.menu_back)
+                    )
+                }
             }
         },
         modifier = modifier
@@ -101,7 +103,7 @@ fun FullScreenScaffold(
     content: @Composable (systemBars: PaddingValues) -> Unit,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
-    onBackClick: (() -> Unit) = {}
+    onBackClick: (() -> Unit)? = null
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val systemBars = WindowInsets.statusBars
