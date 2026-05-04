@@ -5,19 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,7 +82,7 @@ class PhotoListViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     photos = Loadable.Loading,
-                    isNextPageLoading = false
+                    isNextPageLoading = false,
                 )
             }
             repository.clearPhotos()
@@ -105,7 +101,7 @@ class PhotoListViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     photos = Loadable.Loading,
-                    isNextPageLoading = false
+                    isNextPageLoading = false,
                 )
             }
 
@@ -118,8 +114,8 @@ class PhotoListViewModel @Inject constructor(
                 if (!noCachedPhotos) {
                     _effect.send(
                         PhotoListEffect.ShowErrorToast(
-                            result.throwable.message.orEmpty()
-                        )
+                            result.throwable.message.orEmpty(),
+                        ),
                     )
                 } else {
                     _uiState.update { it.copy(photos = result) }
@@ -139,8 +135,8 @@ class PhotoListViewModel @Inject constructor(
                 // partial update show toast
                 _effect.send(
                     PhotoListEffect.ShowErrorToast(
-                        result.throwable.message.orEmpty()
-                    )
+                        result.throwable.message.orEmpty(),
+                    ),
                 )
             }
         }

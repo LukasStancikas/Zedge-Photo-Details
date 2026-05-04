@@ -8,7 +8,7 @@ import com.lukasstancikas.zedge_photos_details.core.database.model.PhotoEntity
 @Database(
     entities = [PhotoEntity::class],
     version = 2,
-    exportSchema = false
+    exportSchema = false,
 )
 abstract class ZedgeDatabase : RoomDatabase() {
     abstract fun photoDao(): PhotoDao

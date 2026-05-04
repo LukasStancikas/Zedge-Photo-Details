@@ -7,11 +7,8 @@ import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -24,7 +21,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -120,7 +116,7 @@ class PhotoListViewModelTest {
             val initialSuccessState = stateTurbine.awaitItem()
             assertEquals(
                 initialPhotos,
-                (initialSuccessState.photos as Loadable.Success<List<Photo>>).data
+                (initialSuccessState.photos as Loadable.Success<List<Photo>>).data,
             )
 
             // Refresh
@@ -140,7 +136,7 @@ class PhotoListViewModelTest {
             val refreshedState = stateTurbine.awaitItem()
             assertEquals(
                 refreshedPhotos,
-                (refreshedState.photos as Loadable.Success<List<Photo>>).data
+                (refreshedState.photos as Loadable.Success<List<Photo>>).data,
             )
 
             verify(repository, times(2)).loadMorePhotos()
@@ -167,7 +163,7 @@ class PhotoListViewModelTest {
             viewModel.action(PhotoListAction.LoadNextPage)
             // Page incremented and loading finished
             val nextPageLoadingState = stateTurbine.awaitItem()
-            assertTrue( nextPageLoadingState.isNextPageLoading)
+            assertTrue(nextPageLoadingState.isNextPageLoading)
             val nextPageLoadedState = stateTurbine.awaitItem()
             assertFalse(nextPageLoadedState.isNextPageLoading)
 
@@ -232,7 +228,7 @@ class PhotoListViewModelTest {
             val regularPhotosState = stateTurbine.awaitItem()
             assertEquals(
                 regularPhotos,
-                (regularPhotosState.photos as Loadable.Success<List<Photo>>).data
+                (regularPhotosState.photos as Loadable.Success<List<Photo>>).data,
             )
 
             viewModel.action(PhotoListAction.ToggleFavoritesFilter)
@@ -246,7 +242,7 @@ class PhotoListViewModelTest {
             val favoritePhotosState = stateTurbine.awaitItem()
             assertEquals(
                 favoritePhotos,
-                (favoritePhotosState.photos as Loadable.Success<List<Photo>>).data
+                (favoritePhotosState.photos as Loadable.Success<List<Photo>>).data,
             )
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
@@ -260,6 +256,6 @@ class PhotoListViewModelTest {
         height = 100,
         url = "url",
         downloadUrl = "downloadUrl",
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
     )
 }

@@ -40,7 +40,7 @@ fun PhotoDetailsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         GlideImage(
@@ -54,25 +54,25 @@ fun PhotoDetailsContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(photo.width.toFloat() / photo.height.toFloat()),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
         )
 
         Text(
             text = stringResource(R.string.photo_details_author, photo.author),
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
         )
 
         Text(
             text = stringResource(R.string.photo_details_dimensions, photo.width, photo.height),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
         )
 
         Text(
             text = stringResource(R.string.photo_details_original_url, photo.url),
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
         )
     }
 }
@@ -88,7 +88,7 @@ fun PhotoDetailsContentPreview() {
                 width = 5000,
                 height = 3333,
                 url = "https://unsplash.com/photos/LNR_chXmC6c",
-                downloadUrl = "https://picsum.photos/id/0/5000/3333"
+                downloadUrl = "https://picsum.photos/id/0/5000/3333",
             ),
         )
     }

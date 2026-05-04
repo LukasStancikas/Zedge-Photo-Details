@@ -11,5 +11,5 @@ data class PhotoEntity(
     val height: Int,
     val url: String,
     val downloadUrl: String,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
 )

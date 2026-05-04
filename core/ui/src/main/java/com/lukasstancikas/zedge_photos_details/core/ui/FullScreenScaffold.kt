@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lukasstancikas.zedge_photos_details.core.ui.theme.ZedgePhotosDetailsTheme
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollapsingTopAppBar(
@@ -45,7 +44,7 @@ fun CollapsingTopAppBar(
     modifier: Modifier = Modifier,
     systemBarsPadding: PaddingValues = PaddingValues(),
     actions: @Composable RowScope.() -> Unit = {},
-    onBackClick: (() -> Unit)? = null
+    onBackClick: (() -> Unit)? = null,
 ) {
     val layoutDirection = LocalLayoutDirection.current
 
@@ -54,15 +53,15 @@ fun CollapsingTopAppBar(
             Text(
                 title,
                 modifier = Modifier.padding(top = systemBarsPadding.calculateTopPadding()),
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
             )
         },
         actions = {
             Row(
                 modifier = Modifier.padding(
                     end = systemBarsPadding.calculateEndPadding(layoutDirection),
-                    top = systemBarsPadding.calculateTopPadding()
-                )
+                    top = systemBarsPadding.calculateTopPadding(),
+                ),
             ) {
                 actions()
             }
@@ -70,7 +69,7 @@ fun CollapsingTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
             scrolledContainerColor = MaterialTheme.colorScheme.primary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         scrollBehavior = topAppBarScrollBehavior,
         expandedHeight = TopAppBarDefaults.MediumAppBarCollapsedHeight + systemBarsPadding.calculateTopPadding(),
@@ -81,18 +80,18 @@ fun CollapsingTopAppBar(
                     onClick = onBackClick,
                     modifier = Modifier.padding(
                         start = systemBarsPadding.calculateStartPadding(layoutDirection),
-                        top = systemBarsPadding.calculateTopPadding()
-                    )
+                        top = systemBarsPadding.calculateTopPadding(),
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = stringResource(R.string.menu_back)
+                        contentDescription = stringResource(R.string.menu_back),
                     )
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -103,7 +102,7 @@ fun FullScreenScaffold(
     content: @Composable (systemBars: PaddingValues) -> Unit,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {},
-    onBackClick: (() -> Unit)? = null
+    onBackClick: (() -> Unit)? = null,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val systemBars = WindowInsets.statusBars
@@ -119,7 +118,7 @@ fun FullScreenScaffold(
                 topAppBarScrollBehavior = scrollBehavior,
                 actions = actions,
                 onBackClick = onBackClick,
-                systemBarsPadding = systemBars
+                systemBarsPadding = systemBars,
             )
         },
         modifier = modifier
@@ -130,13 +129,12 @@ fun FullScreenScaffold(
             start = systemBars.calculateStartPadding(layoutDirection),
             top = innerPadding.calculateTopPadding(),
             end = systemBars.calculateEndPadding(layoutDirection),
-            bottom = 0.dp
+            bottom = 0.dp,
         )
         Box(Modifier.padding(contentPadding)) {
             content(systemBars)
         }
     }
-
 }
 
 @Preview(showSystemUi = true, showBackground = true)
@@ -149,13 +147,13 @@ private fun FullScreenScaffoldPreview() {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 ) {
                     items(35) {
                         Text(text = "$it, Content goes here")
                     }
                 }
-            }
+            },
         )
     }
 }

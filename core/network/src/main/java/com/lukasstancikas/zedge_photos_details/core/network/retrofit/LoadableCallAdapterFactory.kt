@@ -15,7 +15,7 @@ class LoadableCallAdapterFactory : CallAdapter.Factory() {
     override fun get(
         returnType: Type,
         annotations: Array<out Annotation>,
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): CallAdapter<*, *>? {
         // When a suspend function is used, Retrofit wraps the return type in a Call.
         // e.g., suspend fun foo(): Loadable<T> becomes a search for CallAdapter<T, Call<Loadable<T>>>
@@ -34,18 +34,16 @@ class LoadableCallAdapterFactory : CallAdapter.Factory() {
 }
 
 private class LoadableCallAdapter<R>(
-    private val responseType: Type
+    private val responseType: Type,
 ) : CallAdapter<R, Call<Loadable<R>>> {
     override fun responseType(): Type = responseType
 
-    override fun adapt(call: Call<R>): Call<Loadable<R>> {
-        return LoadableCall(call, responseType)
-    }
+    override fun adapt(call: Call<R>): Call<Loadable<R>> = LoadableCall(call, responseType)
 }
 
 private class LoadableCall<R>(
     private val retrofitCall: Call<R>,
-    private val responseType: Type
+    private val responseType: Type,
 ) : Call<Loadable<R>> {
     override fun enqueue(callback: Callback<Loadable<R>>) {
         retrofitCall.enqueue(object : Callback<R> {
@@ -63,15 +61,13 @@ private class LoadableCall<R>(
 
     override fun isExecuted(): Boolean = retrofitCall.isExecuted
 
-    override fun execute(): Response<Loadable<R>> {
-        return try {
-            val response = retrofitCall.execute()
-            val result = response.toLoadable()
-            Response.success(result)
-        } catch (e: Exception) {
-            // wrap with success to avoid retrofit throwing exceptions at call site
-            Response.success(Loadable.Error(e))
-        }
+    override fun execute(): Response<Loadable<R>> = try {
+        val response = retrofitCall.execute()
+        val result = response.toLoadable()
+        Response.success(result)
+    } catch (e: Exception) {
+        // wrap with success to avoid retrofit throwing exceptions at call site
+        Response.success(Loadable.Error(e))
     }
 
     override fun cancel() = retrofitCall.cancel()
@@ -87,10 +83,10 @@ private class LoadableCall<R>(
         val result = when {
             this.isSuccessful && body != null -> Loadable.Success(body)
             this.isSuccessful && body == null && responseType == Unit::class.java
-                -> Loadable.Success(Unit as R)
+            -> Loadable.Success(Unit as R)
 
             this.isSuccessful && body == null && responseType != Unit::class.java
-                -> Loadable.Error(Exception("Response body is null, return type should be declared Loadable<Unit>"))
+            -> Loadable.Error(Exception("Response body is null, return type should be declared Loadable<Unit>"))
 
             else -> Loadable.Error(Exception("Network error: $code"))
         }

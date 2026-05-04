@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun PhotoDetailsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PhotoDetailsViewModel = hiltViewModel()
+    viewModel: PhotoDetailsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -56,11 +56,11 @@ fun PhotoDetailsScreen(
                 content = { photo ->
                     PhotoDetailsContent(
                         photo = photo,
-                        contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding())
+                        contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding()),
                     )
-                }
+                },
             )
-        }
+        },
     )
 }
 
@@ -72,7 +72,7 @@ fun DetailsAppBarActions(photo: Photo?, action: (PhotoDetailsAction) -> Unit) {
         IconButton(onClick = { action(PhotoDetailsAction.SharePhoto) }) {
             Icon(
                 imageVector = Icons.Default.Share,
-                contentDescription = stringResource(R.string.menu_share)
+                contentDescription = stringResource(R.string.menu_share),
             )
         }
         IconButton(onClick = { action(PhotoDetailsAction.ToggleFavorite) }) {
@@ -86,7 +86,7 @@ fun DetailsAppBarActions(photo: Photo?, action: (PhotoDetailsAction) -> Unit) {
                     stringResource(R.string.menu_favorites_remove)
                 } else {
                     stringResource(
-                        R.string.menu_favorites_add
+                        R.string.menu_favorites_add,
                     )
                 },
             )

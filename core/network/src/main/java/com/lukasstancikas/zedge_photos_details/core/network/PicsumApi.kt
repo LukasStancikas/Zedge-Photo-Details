@@ -9,6 +9,6 @@ interface PicsumApi {
     @GET("v2/list")
     suspend fun getPhotos(
         @Query("page") page: Int,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
     ): Loadable<List<PhotoDto>>
 }

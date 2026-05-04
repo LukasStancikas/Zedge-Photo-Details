@@ -15,7 +15,7 @@ fun PhotoEntity.toDomain(): Photo = Photo(
     height = height,
     url = url,
     downloadUrl = downloadUrl,
-    isFavorite = isFavorite
+    isFavorite = isFavorite,
 )
 
 fun Photo.toEntity(): PhotoEntity = PhotoEntity(
@@ -25,7 +25,7 @@ fun Photo.toEntity(): PhotoEntity = PhotoEntity(
     height = height,
     url = url,
     downloadUrl = downloadUrl,
-    isFavorite = isFavorite
+    isFavorite = isFavorite,
 )
 
 fun PhotoDto.toDomain(): Photo = Photo(
@@ -35,5 +35,5 @@ fun PhotoDto.toDomain(): Photo = Photo(
     height = height,
     url = url,
     downloadUrl = downloadUrl,
-    isFavorite = false
+    isFavorite = false,
 )

@@ -15,19 +15,15 @@ import javax.inject.Inject
 
 class PhotoRepositoryImpl @Inject constructor(
     private val api: PicsumApi,
-    private val dao: PhotoDao
+    private val dao: PhotoDao,
 ) : PhotoRepository {
 
-    override fun getPhotosFlow(): Flow<List<Photo>> {
-        return dao.getPhotosFlow().map { entities ->
-            entities.map { it.toDomain() }
-        }
+    override fun getPhotosFlow(): Flow<List<Photo>> = dao.getPhotosFlow().map { entities ->
+        entities.map { it.toDomain() }
     }
 
-    override fun getFavoritePhotosFlow(): Flow<List<Photo>> {
-        return dao.getFavoritePhotosFlow().map { entities ->
-            entities.map { it.toDomain() }
-        }
+    override fun getFavoritePhotosFlow(): Flow<List<Photo>> = dao.getFavoritePhotosFlow().map { entities ->
+        entities.map { it.toDomain() }
     }
 
     override suspend fun loadMorePhotos(): Loadable<Unit> {
@@ -38,7 +34,7 @@ class PhotoRepositoryImpl @Inject constructor(
             try {
                 // When saving to DB, we use upsert to preserve isFavorite status automatically
                 dao.upsertPhotosPreservingFavorite(
-                    networkResult.data.map { it.toEntity() }
+                    networkResult.data.map { it.toEntity() },
                 )
                 Loadable.Success(Unit)
             } catch (e: Exception) {
@@ -50,17 +46,15 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPhoto(id: String): Loadable<Photo> {
-        return try {
-            val entity = dao.getPhoto(id)
-            if (entity != null) {
-                Loadable.Success(entity.toDomain())
-            } else {
-                Loadable.Error(Exception("Photo not found"))
-            }
-        } catch (e: Exception) {
-            Loadable.Error(e)
+    override suspend fun getPhoto(id: String): Loadable<Photo> = try {
+        val entity = dao.getPhoto(id)
+        if (entity != null) {
+            Loadable.Success(entity.toDomain())
+        } else {
+            Loadable.Error(Exception("Photo not found"))
         }
+    } catch (e: Exception) {
+        Loadable.Error(e)
     }
 
     override suspend fun toggleFavorite(id: String, isFavorite: Boolean) {
@@ -70,7 +64,7 @@ class PhotoRepositoryImpl @Inject constructor(
     override suspend fun clearPhotos() {
         dao.clearPhotos()
     }
-    
+
     companion object {
         private const val BATCH_SIZE = 4
     }

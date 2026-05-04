@@ -6,7 +6,7 @@ import android.widget.Toast
 
 fun sharePhotoUrl(
     url: String,
-    context: Context
+    context: Context,
 ) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
@@ -15,8 +15,8 @@ fun sharePhotoUrl(
     context.startActivity(
         Intent.createChooser(
             intent,
-            context.getString(R.string.share_photo)
-        )
+            context.getString(R.string.share_photo),
+        ),
     )
 }
 

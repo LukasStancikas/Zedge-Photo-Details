@@ -8,7 +8,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.lukasstancikas.zedge_photos_details.core.database.model.PhotoEntity
 import com.lukasstancikas.zedge_photos_details.core.database.model.PhotoMetadata
-
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -30,9 +29,11 @@ interface PhotoDao {
     @Transaction
     suspend fun upsertPhotosPreservingFavorite(photos: List<PhotoEntity>) {
         insertPhotosIgnore(photos)
-        updatePhotosMetadata(photos.map {
-            PhotoMetadata(it.id, it.author, it.width, it.height, it.url, it.downloadUrl)
-        })
+        updatePhotosMetadata(
+            photos.map {
+                PhotoMetadata(it.id, it.author, it.width, it.height, it.url, it.downloadUrl)
+            },
+        )
     }
 
     @Query("SELECT * FROM photos WHERE id = :id")
@@ -44,4 +45,3 @@ interface PhotoDao {
     @Query("DELETE FROM photos")
     suspend fun clearPhotos()
 }
-

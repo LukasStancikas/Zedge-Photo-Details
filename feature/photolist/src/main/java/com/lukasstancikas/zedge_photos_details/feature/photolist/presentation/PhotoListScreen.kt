@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun PhotoListScreen(
     onNavigateToDetails: (String) -> Unit,
-    viewModel: PhotoListViewModel = hiltViewModel()
+    viewModel: PhotoListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -45,14 +45,14 @@ fun PhotoListScreen(
                 R.string.list_title
             } else {
                 R.string.list_title_favorites
-            }
+            },
         ),
         actions = {
             if (!uiState.showFavoritesOnly) {
                 IconButton(onClick = { viewModel.action(PhotoListAction.PullRefresh) }) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.menu_refresh_photos)
+                        contentDescription = stringResource(R.string.menu_refresh_photos),
                     )
                 }
             }
@@ -63,7 +63,7 @@ fun PhotoListScreen(
                     } else {
                         Icons.Default.FavoriteBorder
                     },
-                    contentDescription = stringResource(R.string.menu_favorites_filter)
+                    contentDescription = stringResource(R.string.menu_favorites_filter),
                 )
             }
         },
@@ -79,9 +79,9 @@ fun PhotoListScreen(
                     onPhotoClick = { viewModel.action(PhotoListAction.PhotoClicked(it)) },
                     onLoadNextPage = { viewModel.action(PhotoListAction.LoadNextPage) },
                     isNextPageLoading = uiState.isNextPageLoading,
-                    contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding())
+                    contentPadding = PaddingValues(bottom = systemBars.calculateBottomPadding()),
                 )
             }
-        }
+        },
     )
 }

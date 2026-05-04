@@ -22,7 +22,7 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = TertiaryDark,
     onTertiary = OnTertiaryDark,
     tertiaryContainer = TertiaryContainerDark,
-    onTertiaryContainer = OnTertiaryContainerDark
+    onTertiaryContainer = OnTertiaryContainerDark,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -37,14 +37,14 @@ private val LightColorScheme = lightColorScheme(
     tertiary = TertiaryLight,
     onTertiary = OnTertiaryLight,
     tertiaryContainer = TertiaryContainerLight,
-    onTertiaryContainer = OnTertiaryContainerLight
+    onTertiaryContainer = OnTertiaryContainerLight,
 )
 
 @Composable
 fun ZedgePhotosDetailsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -58,6 +58,6 @@ fun ZedgePhotosDetailsTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        content = content
+        content = content,
     )
 }

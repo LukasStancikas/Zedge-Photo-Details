@@ -41,19 +41,19 @@ fun PhotoListContent(
     onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    isNextPageLoading: Boolean = false
+    isNextPageLoading: Boolean = false,
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize(),
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
     ) {
         items(photos) { photo ->
             PhotoItem(
                 photo = photo,
-                onClick = { onPhotoClick(photo.id) }
+                onClick = { onPhotoClick(photo.id) },
             )
-            
+
             if (photo == photos.last()) {
                 LaunchedEffect(photo.id) {
                     onLoadNextPage()
@@ -67,7 +67,7 @@ fun PhotoListContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -80,21 +80,21 @@ fun PhotoListContent(
 @Composable
 fun PhotoItem(
     photo: Photo,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column {
             GlideImage(
                 model = photo.downloadUrl,
                 contentDescription = stringResource(
                     R.string.photo_content_description,
-                    photo.author
+                    photo.author,
                 ),
                 loading = placeholder {
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -104,19 +104,19 @@ fun PhotoItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = MaterialTheme.colorScheme.primaryContainer)
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Text(
                     text = photo.author,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 val isFavoriteText = if (photo.isFavorite) {
@@ -128,7 +128,7 @@ fun PhotoItem(
                     text = stringResource(R.string.photo_is_favorite, isFavoriteText),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -136,7 +136,7 @@ fun PhotoItem(
                         R.string.photo_fake_description,
                         photo.author,
                         photo.width,
-                        photo.height
+                        photo.height,
                     ),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium,
@@ -159,7 +159,7 @@ fun PhotoListContentPreview() {
                     height = 3333,
                     url = "https://unsplash.com/photos/LNR_chXmC6c",
                     downloadUrl = "https://picsum.photos/id/0/5000/3333",
-                    isFavorite = true
+                    isFavorite = true,
                 ),
                 Photo(
                     id = "2",
@@ -167,11 +167,11 @@ fun PhotoListContentPreview() {
                     width = 2500,
                     height = 1667,
                     url = "https://unsplash.com/photos/6J--NX9BIuM",
-                    downloadUrl = "https://picsum.photos/id/10/2500/1667"
-                )
+                    downloadUrl = "https://picsum.photos/id/10/2500/1667",
+                ),
             ),
             onPhotoClick = {},
-            onLoadNextPage = {}
+            onLoadNextPage = {},
         )
     }
 }

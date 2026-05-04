@@ -31,9 +31,8 @@ fun <T> ReloadableContent(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
-    content: @Composable (T) -> Unit
+    content: @Composable (T) -> Unit,
 ) {
-
     if (isEnabled) {
         PullToRefreshBox(
             isRefreshing = loadable is Loadable.Loading,
@@ -45,7 +44,7 @@ fun <T> ReloadableContent(
                 loadable = loadable,
                 onRetry = onRetry,
                 content = content,
-                customLoading = {}
+                customLoading = {},
             )
         }
     } else {
@@ -55,7 +54,7 @@ fun <T> ReloadableContent(
             LoadableContent(
                 loadable = loadable,
                 onRetry = onRetry,
-                content = content
+                content = content,
             )
         }
     }
@@ -71,19 +70,19 @@ fun <T> LoadableContent(
         Box(modifier = modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    }
+    },
 ) {
     when (loadable) {
         is Loadable.Error -> {
             Column(
                 modifier = modifier.fillMaxSize().padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = loadable.throwable.message
                         ?: stringResource(R.string.error_message_unknown),
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = onRetry) {
@@ -109,11 +108,10 @@ private fun CustomLoadableContentLoadingPreview() {
         LoadableContent(
             loadable = Loadable.Loading,
             onRetry = {},
-            content = {}
+            content = {},
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -123,7 +121,7 @@ private fun ReloadableContentLoadingPreview() {
             loadable = Loadable.Loading,
             onRetry = {},
             onRefresh = {},
-            content = {}
+            content = {},
         )
     }
 }
@@ -134,11 +132,11 @@ private fun ReloadableContentErrorPreview() {
     ZedgePhotosDetailsTheme {
         ReloadableContent(
             loadable = Loadable.Error(
-                Throwable("Unable to resolve host TEST. No address and text is long")
+                Throwable("Unable to resolve host TEST. No address and text is long"),
             ),
             onRetry = {},
             onRefresh = {},
-            content = {}
+            content = {},
         )
     }
 }
@@ -153,7 +151,7 @@ private fun ReloadableContentSuccessPreview() {
             onRefresh = {},
             content = { data ->
                 Text("Content: $data", modifier = Modifier.fillMaxSize())
-            }
+            },
         )
     }
 }

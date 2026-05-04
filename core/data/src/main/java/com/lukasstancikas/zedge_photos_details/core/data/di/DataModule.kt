@@ -15,6 +15,6 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindPhotoRepository(
-        photoRepositoryImpl: PhotoRepositoryImpl
+        photoRepositoryImpl: PhotoRepositoryImpl,
     ): PhotoRepository
 }

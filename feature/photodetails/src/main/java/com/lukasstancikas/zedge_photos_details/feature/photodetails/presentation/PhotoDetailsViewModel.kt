@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoDetailsViewModel @Inject constructor(
     private val repository: PhotoRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val destination: PhotoDetailsDestination =
@@ -63,7 +63,7 @@ class PhotoDetailsViewModel @Inject constructor(
             repository.toggleFavorite(uiState.value.photoId, newFavoriteStatus)
             _uiState.update { state ->
                 state.copy(
-                    photo = state.photo.map { it.copy(isFavorite = newFavoriteStatus) }
+                    photo = state.photo.map { it.copy(isFavorite = newFavoriteStatus) },
                 )
             }
         }
@@ -76,4 +76,3 @@ class PhotoDetailsViewModel @Inject constructor(
         }
     }
 }
-

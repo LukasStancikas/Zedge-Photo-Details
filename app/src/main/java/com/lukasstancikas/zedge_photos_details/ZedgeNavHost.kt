@@ -14,18 +14,18 @@ fun ZedgeNavHost() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = PhotoListDestination
+        startDestination = PhotoListDestination,
     ) {
         composable<PhotoListDestination> {
             PhotoListScreen(
                 onNavigateToDetails = { photoId ->
                     navController.navigate(PhotoDetailsDestination(photoId))
-                }
+                },
             )
         }
         composable<PhotoDetailsDestination> {
             PhotoDetailsScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
             )
         }
     }
