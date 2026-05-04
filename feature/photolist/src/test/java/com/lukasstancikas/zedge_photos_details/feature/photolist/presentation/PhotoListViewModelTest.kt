@@ -26,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -57,7 +58,7 @@ class PhotoListViewModelTest {
     @Test
     fun `initial load success updates state with photos`() = runTest {
         val photos = listOf(createPhoto("1"))
-        whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
+        whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
         photosFlow.value = photos
 
         turbineScope {
@@ -72,7 +73,6 @@ class PhotoListViewModelTest {
             advanceUntilIdle()
             val successState = stateTurbine.awaitItem()
             assertEquals(photos, (successState.photos as Loadable.Success<List<Photo>>).data)
-            assertEquals(1, successState.currentPage)
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
@@ -81,7 +81,7 @@ class PhotoListViewModelTest {
     @Test
     fun `load photos failure updates state with error`() = runTest {
         val errorMessage = "Network error"
-        whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Error(Exception(errorMessage)))
+        whenever(repository.loadMorePhotos()).thenReturn(Loadable.Error(Exception(errorMessage)))
 
         turbineScope {
             viewModel = PhotoListViewModel(repository)
@@ -106,7 +106,7 @@ class PhotoListViewModelTest {
         val initialPhotos = listOf(createPhoto("1"))
         val refreshedPhotos = listOf(createPhoto("1"), createPhoto("2"))
 
-        whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
+        whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
 
         turbineScope {
             viewModel = PhotoListViewModel(repository)
@@ -132,7 +132,7 @@ class PhotoListViewModelTest {
             assertEquals(Loadable.Loading, refreshingState.photos)
 
             // 2. Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow()
-            // after repository.loadPhotoPage(page = 1)
+            // after repository.loadMorePhotos()
             advanceUntilIdle()
             photosFlow.value = refreshedPhotos
 
@@ -142,18 +142,17 @@ class PhotoListViewModelTest {
                 refreshedPhotos,
                 (refreshedState.photos as Loadable.Success<List<Photo>>).data
             )
-            assertEquals(1, refreshedState.currentPage)
 
-            verify(repository, org.mockito.kotlin.times(2)).loadPhotoPage(1)
+            verify(repository, times(2)).loadMorePhotos()
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `load next page success increments page`() = runTest {
+    fun `load next page success`() = runTest {
         turbineScope {
             val photos = listOf(createPhoto("1"))
-            whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
+            whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
             photosFlow.value = photos
 
             viewModel = PhotoListViewModel(repository)
@@ -172,17 +171,15 @@ class PhotoListViewModelTest {
             val nextPageLoadedState = stateTurbine.awaitItem()
             assertFalse(nextPageLoadedState.isNextPageLoading)
 
-            val nextPageSuccessState = stateTurbine.awaitItem()
-            assertEquals(2, nextPageSuccessState.currentPage)
-            verify(repository).loadPhotoPage(2)
+            verify(repository, times(2)).loadMorePhotos()
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `load next page failure triggers ShowErrorToast effect`() = runTest {
-        whenever(repository.loadPhotoPage(1)).thenReturn(Loadable.Success(Unit))
-        whenever(repository.loadPhotoPage(2)).thenReturn(Loadable.Error(Exception("Paging error")))
+        whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
+            .thenReturn(Loadable.Error(Exception("Paging error")))
 
         turbineScope {
             viewModel = PhotoListViewModel(repository)
@@ -207,8 +204,6 @@ class PhotoListViewModelTest {
             val nextPageLoadedState = stateTurbine.awaitItem()
             assertFalse(nextPageLoadedState.isNextPageLoading)
 
-            assertEquals(1, viewModel.uiState.value.currentPage)
-
             stateTurbine.cancelAndIgnoreRemainingEvents()
             effectTurbine.cancelAndIgnoreRemainingEvents()
         }
@@ -216,7 +211,7 @@ class PhotoListViewModelTest {
 
     @Test
     fun `toggle favorites filter switches flows`() = runTest {
-        whenever(repository.loadPhotoPage(any())).thenReturn(Loadable.Success(Unit))
+        whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
 
         val regularPhotos = listOf(createPhoto("1"))
         val favoritePhotos = listOf(createPhoto("2", isFavorite = true))

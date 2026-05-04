@@ -8,8 +8,8 @@ import com.lukasstancikas.zedge_photos_details.core.database.dao.PhotoDao
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import com.lukasstancikas.zedge_photos_details.core.network.PicsumApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -30,8 +30,10 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadPhotoPage(page: Int): Loadable<Unit> {
-        val networkResult = api.getPhotos(page, 4).mapAll { it.toDomain() }
+    override suspend fun loadMorePhotos(): Loadable<Unit> {
+        val currentPhotosCount = dao.getPhotosFlow().first().size
+        val nextPage = (currentPhotosCount / BATCH_SIZE) + 1
+        val networkResult = api.getPhotos(nextPage, BATCH_SIZE).mapAll { it.toDomain() }
         return if (networkResult is Loadable.Success) {
             try {
                 // When saving to DB, we use upsert to preserve isFavorite status automatically
@@ -67,5 +69,9 @@ class PhotoRepositoryImpl @Inject constructor(
 
     override suspend fun clearPhotos() {
         dao.clearPhotos()
+    }
+    
+    companion object {
+        private const val BATCH_SIZE = 4
     }
 }

@@ -2,9 +2,9 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,18 +40,30 @@ fun PhotoListScreen(
     }
 
     FullScreenScaffold(
-        title = stringResource(R.string.list_title),
+        title = stringResource(
+            if (!uiState.showFavoritesOnly) {
+                R.string.list_title
+            } else {
+                R.string.list_title_favorites
+            }
+        ),
         actions = {
+            if (!uiState.showFavoritesOnly) {
+                IconButton(onClick = { viewModel.action(PhotoListAction.PullRefresh) }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.menu_refresh_photos)
+                    )
+                }
+            }
             IconButton(onClick = { viewModel.action(PhotoListAction.ToggleFavoritesFilter) }) {
                 Icon(
-                    imageVector = if (uiState.showFavoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    imageVector = if (uiState.showFavoritesOnly) {
+                        Icons.Default.Favorite
+                    } else {
+                        Icons.Default.FavoriteBorder
+                    },
                     contentDescription = stringResource(R.string.menu_favorites_filter)
-                )
-            }
-            IconButton(onClick = { viewModel.action(PhotoListAction.ClearPhotos) }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.menu_clear_photos)
                 )
             }
         },

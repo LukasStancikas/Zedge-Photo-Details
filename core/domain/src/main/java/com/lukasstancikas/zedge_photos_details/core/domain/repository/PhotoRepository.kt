@@ -9,7 +9,7 @@ interface PhotoRepository {
 
     fun getFavoritePhotosFlow(): Flow<List<Photo>>
 
-    suspend fun loadPhotoPage(page: Int): Loadable<Unit>
+    suspend fun loadMorePhotos(): Loadable<Unit>
 
     suspend fun getPhoto(id: String): Loadable<Photo>
 

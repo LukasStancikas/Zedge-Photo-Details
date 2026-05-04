@@ -62,7 +62,6 @@ class PhotoListViewModel @Inject constructor(
             is PhotoListAction.LoadPhotos -> fetchCurrentPhotos()
             is PhotoListAction.LoadNextPage -> fetchNextPage()
             is PhotoListAction.PullRefresh -> refreshPhotos()
-            is PhotoListAction.ClearPhotos -> clearPhotos()
             is PhotoListAction.ToggleFavoritesFilter -> {
                 _uiState.update { it.copy(showFavoritesOnly = !it.showFavoritesOnly) }
             }
@@ -87,12 +86,11 @@ class PhotoListViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     photos = Loadable.Loading,
-                    currentPage = 1,
                     isNextPageLoading = false
                 )
             }
-
-            val result = repository.loadPhotoPage(page = 1)
+            repository.clearPhotos()
+            val result = repository.loadMorePhotos()
 
             if (result is Loadable.Error) {
                 _uiState.update { it.copy(photos = result) }
@@ -104,17 +102,14 @@ class PhotoListViewModel @Inject constructor(
         if (uiState.value.showFavoritesOnly) return
 
         viewModelScope.launch {
-            val pageToLoad = _uiState.value.currentPage
-
             _uiState.update {
                 it.copy(
                     photos = Loadable.Loading,
-                    currentPage = pageToLoad,
                     isNextPageLoading = false
                 )
             }
 
-            val result = repository.loadPhotoPage(page = pageToLoad)
+            val result = repository.loadMorePhotos()
 
             if (result is Loadable.Error) {
                 val noCachedPhotos =
@@ -138,8 +133,7 @@ class PhotoListViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isNextPageLoading = true) }
-            val nextPage = _uiState.value.currentPage + 1
-            val result = repository.loadPhotoPage(page = nextPage)
+            val result = repository.loadMorePhotos()
             _uiState.update { it.copy(isNextPageLoading = false) }
             if (result is Loadable.Error) {
                 // partial update show toast
@@ -148,18 +142,7 @@ class PhotoListViewModel @Inject constructor(
                         result.throwable.message.orEmpty()
                     )
                 )
-            } else {
-                _uiState.update { it.copy(currentPage = nextPage) }
             }
-        }
-
-
-    }
-
-    private fun clearPhotos() {
-        viewModelScope.launch {
-            repository.clearPhotos()
-            _uiState.update { it.copy(currentPage = 1) }
         }
     }
 }
