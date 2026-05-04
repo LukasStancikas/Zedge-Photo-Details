@@ -9,9 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -66,7 +64,6 @@ class PhotoListViewModelTest {
             assertEquals(Loadable.Loading, initialState.photos)
 
             // After repository finishes loading and flow emits: Success
-            advanceUntilIdle()
             val successState = stateTurbine.awaitItem()
             assertEquals(photos, (successState.photos as Loadable.Success<List<Photo>>).data)
 
@@ -88,7 +85,6 @@ class PhotoListViewModelTest {
             assertEquals(Loadable.Loading, initialState.photos)
 
             // After repository failure: Error
-            advanceUntilIdle()
             val errorState = stateTurbine.awaitItem()
             assertTrue(errorState.photos is Loadable.Error)
             assertEquals(errorMessage, (errorState.photos as Loadable.Error).throwable.message)
@@ -121,18 +117,16 @@ class PhotoListViewModelTest {
 
             // Refresh
             viewModel.action(PhotoListAction.PullRefresh)
-            runCurrent()
 
-            // 1. Switches to Loading during refresh
+            // Switches to Loading during refresh
             val refreshingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, refreshingState.photos)
 
-            // 2. Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow()
+            // Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow()
             // after repository.loadMorePhotos()
-            advanceUntilIdle()
             photosFlow.value = refreshedPhotos
 
-            // 3. Returns to Success
+            // Returns to Success
             val refreshedState = stateTurbine.awaitItem()
             assertEquals(
                 refreshedPhotos,
@@ -189,12 +183,12 @@ class PhotoListViewModelTest {
             assertTrue(initialSuccessState.photos is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
-            // 2. Effect emitted on failure
+            // Effect emitted on failure
             val effect = effectTurbine.awaitItem()
             assertTrue(effect is PhotoListEffect.ShowErrorToast)
             assertEquals("Paging error", (effect as PhotoListEffect.ShowErrorToast).error)
 
-            // 3. Paging started (back to false)
+            // Paging started (back to false)
             val nextPageLoadingState = stateTurbine.awaitItem()
             assertTrue(nextPageLoadingState.isNextPageLoading)
             val nextPageLoadedState = stateTurbine.awaitItem()
@@ -219,12 +213,11 @@ class PhotoListViewModelTest {
             viewModel = PhotoListViewModel(repository)
             val stateTurbine = viewModel.uiState.testIn(this)
 
-            // 1. Initial Loading
+            // Initial Loading
             val initialLoadingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, initialLoadingState.photos)
 
-            // 2. Regular photos loaded from flow
-            advanceUntilIdle()
+            // Regular photos loaded from flow
             val regularPhotosState = stateTurbine.awaitItem()
             assertEquals(
                 regularPhotos,
@@ -233,12 +226,11 @@ class PhotoListViewModelTest {
 
             viewModel.action(PhotoListAction.ToggleFavoritesFilter)
 
-            // 3. Filter toggled (showFavoritesOnly = true)
+            // Filter toggled (showFavoritesOnly = true)
             val filterToggledState = stateTurbine.awaitItem()
             assertTrue(filterToggledState.showFavoritesOnly)
 
-            // 4. Data switched to favorite flow
-            advanceUntilIdle()
+            // Data switched to favorite flow
             val favoritePhotosState = stateTurbine.awaitItem()
             assertEquals(
                 favoritePhotos,
