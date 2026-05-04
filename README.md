@@ -28,3 +28,9 @@ struggles:
 to show instantly new state of favorited item
 - Error states acting in a coherent UX way from initial load, refresh, load-more
 - pagination with DB was interesting
+- additional features could be: 
+  - add favorite toggle in the list item 
+  - drop-down or dialog to select what to share, URL or raw photo data
+  - full screen display of image on click inside details with finger controls
+- Bug: when DB fetches, lets say 48 images, and network call finishes with first page (4 items), we scroll all the way to the bottom, and only then trigger page 2, when indeed its already page (48 / 4)
+  - calculate how many pages to advances from the initial fetch (divide by exposed 4), or keep incrementing number if upsert returns false (nothing was added or updated)
