@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.lukasstancikas.zedge_photos_details"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 

@@ -36,4 +36,4 @@
   - Add favorite toggle in the list item 
   - Drop-down or dialog to select what to share, URL or raw photo data
   - Full screen display of image on click inside details with finger controls
-  - Update all dependency versions, And latest Android
+  - Update all dependency versions
