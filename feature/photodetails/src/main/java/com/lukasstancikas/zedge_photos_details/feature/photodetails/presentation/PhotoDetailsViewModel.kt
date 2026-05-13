@@ -9,6 +9,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +21,7 @@ class PhotoDetailsViewModel @AssistedInject constructor(
     @Assisted photoId: String,
     private val repository: PhotoRepository,
     private val contentSharingController: ContentSharingController,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -43,7 +45,7 @@ class PhotoDetailsViewModel @AssistedInject constructor(
     }
 
     private fun loadPhoto() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             _uiState.update { it.copy(photo = Loadable.Loading) }
             val result = repository.getPhoto(uiState.value.photoId)
             _uiState.update { state ->
@@ -56,7 +58,7 @@ class PhotoDetailsViewModel @AssistedInject constructor(
 
     private fun toggleFavorite() {
         val currentPhoto = (uiState.value.photo as? Loadable.Success)?.data ?: return
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             val newFavoriteStatus = !currentPhoto.isFavorite
             repository.toggleFavorite(uiState.value.photoId, newFavoriteStatus)
             _uiState.update { state ->

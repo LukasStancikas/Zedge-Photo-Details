@@ -58,7 +58,7 @@ class PhotoListViewModelTest {
         photosFlow.value = photos
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial State: Loading
@@ -82,7 +82,7 @@ class PhotoListViewModelTest {
         whenever(repository.loadMorePhotos()).thenReturn(Loadable.Error(Exception(errorMessage)))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial State: Loading
@@ -106,7 +106,7 @@ class PhotoListViewModelTest {
         whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial load
@@ -150,7 +150,7 @@ class PhotoListViewModelTest {
             whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
             photosFlow.value = photos
 
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
@@ -177,7 +177,7 @@ class PhotoListViewModelTest {
             .thenReturn(Loadable.Error(Exception("Paging error")))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
@@ -210,7 +210,7 @@ class PhotoListViewModelTest {
         favoritePhotosFlow.value = favoritePhotos
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository, messageController)
+            viewModel = PhotoListViewModel(repository, messageController, testDispatcher)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial Loading

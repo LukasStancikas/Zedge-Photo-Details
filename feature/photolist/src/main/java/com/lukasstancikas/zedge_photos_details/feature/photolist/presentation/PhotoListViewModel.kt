@@ -6,6 +6,7 @@ import com.lukasstancikas.zedge_photos_details.core.common.message.MessageContro
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class PhotoListViewModel @Inject constructor(
     private val repository: PhotoRepository,
     private val messageController: MessageController,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PhotoListUiState())
@@ -84,7 +86,7 @@ class PhotoListViewModel @Inject constructor(
 
     private fun refreshPhotos() {
         if (uiState.value.showFavoritesOnly) return
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             _uiState.update {
                 it.copy(
                     loadedState = Loadable.Loading,
@@ -103,7 +105,7 @@ class PhotoListViewModel @Inject constructor(
     private fun fetchCurrentPhotos() {
         if (uiState.value.showFavoritesOnly) return
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             _uiState.update {
                 it.copy(
                     loadedState = Loadable.Loading,
@@ -129,7 +131,7 @@ class PhotoListViewModel @Inject constructor(
     private fun fetchNextPage() {
         if (uiState.value.showFavoritesOnly || uiState.value.isNextPageLoading) return
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             _uiState.update { it.copy(isNextPageLoading = true) }
             val result = repository.loadMorePhotos()
             _uiState.update { it.copy(isNextPageLoading = false) }
