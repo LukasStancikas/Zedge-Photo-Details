@@ -26,8 +26,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoDetailsScreen(
+    photoId: String,
     onBackClick: () -> Unit,
-    viewModel: PhotoDetailsViewModel = hiltViewModel(),
+    viewModel: PhotoDetailsViewModel = hiltViewModel<PhotoDetailsViewModel, PhotoDetailsViewModel.Factory>(
+        creationCallback = { factory -> factory.create(photoId = photoId) }
+    )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current

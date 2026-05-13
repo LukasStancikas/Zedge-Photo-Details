@@ -1,12 +1,12 @@
 package com.lukasstancikas.zedge_photos_details.feature.photodetails.presentation
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
-import com.lukasstancikas.zedge_photos_details.feature.photodetails.navigation.PhotoDetailsDestination
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,18 +15,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PhotoDetailsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = PhotoDetailsViewModel.Factory::class)
+class PhotoDetailsViewModel @AssistedInject constructor(
+    @Assisted photoId: String,
     private val repository: PhotoRepository,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val destination: PhotoDetailsDestination =
-        savedStateHandle.toRoute<PhotoDetailsDestination>()
+    @AssistedFactory
+    interface Factory {
+        fun create(photoId: String): PhotoDetailsViewModel
+    }
 
-    private val _uiState = MutableStateFlow(PhotoDetailsUiState(photoId = destination.photoId))
+    private val _uiState = MutableStateFlow(PhotoDetailsUiState(photoId = photoId))
     val uiState: StateFlow<PhotoDetailsUiState> = _uiState.asStateFlow()
 
     private val _effect = Channel<PhotoDetailsEffect>()
