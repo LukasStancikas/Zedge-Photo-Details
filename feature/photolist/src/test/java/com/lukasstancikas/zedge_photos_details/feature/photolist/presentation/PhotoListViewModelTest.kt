@@ -61,11 +61,14 @@ class PhotoListViewModelTest {
 
             // Initial State: Loading
             val initialState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialState.photos)
+            assertEquals(Loadable.Loading, initialState.loadedState)
 
             // After repository finishes loading and flow emits: Success
             val successState = stateTurbine.awaitItem()
-            assertEquals(photos, (successState.photos as Loadable.Success<List<Photo>>).data)
+            assertEquals(
+                photos,
+                (successState.loadedState as Loadable.Success<PhotoListUiState.LoadedState>).data.photos,
+            )
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
@@ -82,12 +85,12 @@ class PhotoListViewModelTest {
 
             // Initial State: Loading
             val initialState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialState.photos)
+            assertEquals(Loadable.Loading, initialState.loadedState)
 
             // After repository failure: Error
             val errorState = stateTurbine.awaitItem()
-            assertTrue(errorState.photos is Loadable.Error)
-            assertEquals(errorMessage, (errorState.photos as Loadable.Error).throwable.message)
+            assertTrue(errorState.loadedState is Loadable.Error)
+            assertEquals(errorMessage, (errorState.loadedState as Loadable.Error).throwable.message)
 
             stateTurbine.cancelAndIgnoreRemainingEvents()
         }
@@ -106,13 +109,13 @@ class PhotoListViewModelTest {
 
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialLoadingState.photos)
+            assertEquals(Loadable.Loading, initialLoadingState.loadedState)
 
             photosFlow.value = initialPhotos
             val initialSuccessState = stateTurbine.awaitItem()
             assertEquals(
                 initialPhotos,
-                (initialSuccessState.photos as Loadable.Success<List<Photo>>).data,
+                (initialSuccessState.loadedState as Loadable.Success<PhotoListUiState.LoadedState>).data.photos,
             )
 
             // Refresh
@@ -120,7 +123,7 @@ class PhotoListViewModelTest {
 
             // Switches to Loading during refresh
             val refreshingState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, refreshingState.photos)
+            assertEquals(Loadable.Loading, refreshingState.loadedState)
 
             // Simulate repository triggering a new batch of items arriving to repository.getPhotosFlow()
             // after repository.loadMorePhotos()
@@ -130,7 +133,7 @@ class PhotoListViewModelTest {
             val refreshedState = stateTurbine.awaitItem()
             assertEquals(
                 refreshedPhotos,
-                (refreshedState.photos as Loadable.Success<List<Photo>>).data,
+                (refreshedState.loadedState as Loadable.Success<PhotoListUiState.LoadedState>).data.photos,
             )
 
             verify(repository, times(2)).loadMorePhotos()
@@ -149,10 +152,10 @@ class PhotoListViewModelTest {
             val stateTurbine = viewModel.uiState.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialLoadingState.photos)
+            assertEquals(Loadable.Loading, initialLoadingState.loadedState)
 
             val initialSuccessState = stateTurbine.awaitItem()
-            assertTrue(initialSuccessState.photos is Loadable.Success)
+            assertTrue(initialSuccessState.loadedState is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
             // Page incremented and loading finished
@@ -177,10 +180,10 @@ class PhotoListViewModelTest {
             val effectTurbine = viewModel.effect.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialLoadingState.photos)
+            assertEquals(Loadable.Loading, initialLoadingState.loadedState)
 
             val initialSuccessState = stateTurbine.awaitItem()
-            assertTrue(initialSuccessState.photos is Loadable.Success)
+            assertTrue(initialSuccessState.loadedState is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
             // Effect emitted on failure
@@ -215,13 +218,13 @@ class PhotoListViewModelTest {
 
             // Initial Loading
             val initialLoadingState = stateTurbine.awaitItem()
-            assertEquals(Loadable.Loading, initialLoadingState.photos)
+            assertEquals(Loadable.Loading, initialLoadingState.loadedState)
 
             // Regular photos loaded from flow
             val regularPhotosState = stateTurbine.awaitItem()
             assertEquals(
                 regularPhotos,
-                (regularPhotosState.photos as Loadable.Success<List<Photo>>).data,
+                (regularPhotosState.loadedState as Loadable.Success<PhotoListUiState.LoadedState>).data.photos,
             )
 
             viewModel.action(PhotoListAction.ToggleFavoritesFilter)
@@ -234,7 +237,7 @@ class PhotoListViewModelTest {
             val favoritePhotosState = stateTurbine.awaitItem()
             assertEquals(
                 favoritePhotos,
-                (favoritePhotosState.photos as Loadable.Success<List<Photo>>).data,
+                (favoritePhotosState.loadedState as Loadable.Success<PhotoListUiState.LoadedState>).data.photos,
             )
 
             stateTurbine.cancelAndIgnoreRemainingEvents()

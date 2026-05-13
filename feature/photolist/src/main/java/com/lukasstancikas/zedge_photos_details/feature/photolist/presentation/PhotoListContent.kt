@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -36,8 +35,8 @@ import com.lukasstancikas.zedge_photos_details.feature.photolist.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoListContent(
-    photos: ImmutableList<Photo>,
+internal fun PhotoListContent(
+    state: PhotoListUiState.LoadedState,
     onPhotoClick: (String) -> Unit,
     onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -49,13 +48,13 @@ fun PhotoListContent(
             .fillMaxSize(),
         contentPadding = contentPadding,
     ) {
-        items(photos) { photo ->
+        items(state.photos) { photo ->
             PhotoItem(
                 photo = photo,
                 onClick = { onPhotoClick(photo.id) },
             )
 
-            if (photo == photos.last() && !isNextPageLoading) {
+            if (photo == state.photos.last() && !isNextPageLoading) {
                 LaunchedEffect(photo.id) {
                     onLoadNextPage()
                 }
@@ -152,24 +151,26 @@ fun PhotoItem(
 fun PhotoListContentPreview() {
     ZedgePhotosDetailsTheme {
         PhotoListContent(
-            photos = listOf(
-                Photo(
-                    id = "1",
-                    author = "Alejandro Escamilla",
-                    width = 5000,
-                    height = 3333,
-                    url = "https://unsplash.com/photos/LNR_chXmC6c",
-                    downloadUrl = "https://picsum.photos/id/0/5000/3333",
-                    isFavorite = true,
-                ),
-                Photo(
-                    id = "2",
-                    author = "Paul Jarvis",
-                    width = 2500,
-                    height = 1667,
-                    url = "https://unsplash.com/photos/6J--NX9BIuM",
-                    downloadUrl = "https://picsum.photos/id/10/2500/1667",
-                ),
+            state = PhotoListUiState.LoadedState(
+                listOf(
+                    Photo(
+                        id = "1",
+                        author = "Alejandro Escamilla",
+                        width = 5000,
+                        height = 3333,
+                        url = "https://unsplash.com/photos/LNR_chXmC6c",
+                        downloadUrl = "https://picsum.photos/id/0/5000/3333",
+                        isFavorite = true,
+                    ),
+                    Photo(
+                        id = "2",
+                        author = "Paul Jarvis",
+                        width = 2500,
+                        height = 1667,
+                        url = "https://unsplash.com/photos/6J--NX9BIuM",
+                        downloadUrl = "https://picsum.photos/id/10/2500/1667",
+                    ),
+                )
             ),
             onPhotoClick = {},
             onLoadNextPage = {},

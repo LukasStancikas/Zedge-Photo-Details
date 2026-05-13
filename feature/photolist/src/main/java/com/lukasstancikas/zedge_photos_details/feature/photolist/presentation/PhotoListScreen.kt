@@ -69,13 +69,13 @@ fun PhotoListScreen(
         },
         content = { systemBars ->
             ReloadableContent(
-                loadable = uiState.photos,
+                loadable = uiState.loadedState,
                 isEnabled = !uiState.showFavoritesOnly,
                 onRetry = { viewModel.action(PhotoListAction.LoadPhotos) },
                 onRefresh = { viewModel.action(PhotoListAction.PullRefresh) },
-            ) { photos ->
+            ) { loadedState ->
                 PhotoListContent(
-                    photos = photos,
+                    state = loadedState,
                     onPhotoClick = { viewModel.action(PhotoListAction.PhotoClicked(it)) },
                     onLoadNextPage = { viewModel.action(PhotoListAction.LoadNextPage) },
                     isNextPageLoading = uiState.isNextPageLoading,

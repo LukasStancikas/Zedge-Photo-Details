@@ -48,7 +48,11 @@ class PhotoListViewModel @Inject constructor(
                     }
                 }
                 .collect { photos ->
-                    _uiState.update { it.copy(photos = Loadable.Success(photos)) }
+                    _uiState.update {
+                        it.copy(
+                            loadedState = Loadable.Success(PhotoListUiState.LoadedState(photos))
+                        )
+                    }
                 }
         }
     }
@@ -81,7 +85,7 @@ class PhotoListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    photos = Loadable.Loading,
+                    loadedState = Loadable.Loading,
                     isNextPageLoading = false,
                 )
             }
@@ -89,7 +93,7 @@ class PhotoListViewModel @Inject constructor(
             val result = repository.loadMorePhotos()
 
             if (result is Loadable.Error) {
-                _uiState.update { it.copy(photos = result) }
+                _uiState.update { it.copy(loadedState = result) }
             }
         }
     }
@@ -100,7 +104,7 @@ class PhotoListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    photos = Loadable.Loading,
+                    loadedState = Loadable.Loading,
                     isNextPageLoading = false,
                 )
             }
@@ -109,7 +113,7 @@ class PhotoListViewModel @Inject constructor(
 
             if (result is Loadable.Error) {
                 val noCachedPhotos =
-                    (_uiState.value.photos as? Loadable.Success)?.data.isNullOrEmpty()
+                    (_uiState.value.loadedState as? Loadable.Success)?.data?.photos.isNullOrEmpty()
 
                 if (!noCachedPhotos) {
                     _effect.send(
@@ -118,7 +122,7 @@ class PhotoListViewModel @Inject constructor(
                         ),
                     )
                 } else {
-                    _uiState.update { it.copy(photos = result) }
+                    _uiState.update { it.copy(loadedState = result) }
                 }
             }
         }
