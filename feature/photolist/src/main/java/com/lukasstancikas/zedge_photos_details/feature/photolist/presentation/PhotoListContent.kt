@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.external.kotlinx.collections.immutable.ImmutableList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -36,7 +37,7 @@ import com.lukasstancikas.zedge_photos_details.feature.photolist.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoListContent(
-    photos: List<Photo>,
+    photos: ImmutableList<Photo>,
     onPhotoClick: (String) -> Unit,
     onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,7 +55,7 @@ fun PhotoListContent(
                 onClick = { onPhotoClick(photo.id) },
             )
 
-            if (photo == photos.last()) {
+            if (photo == photos.last() && !isNextPageLoading) {
                 LaunchedEffect(photo.id) {
                     onLoadNextPage()
                 }
