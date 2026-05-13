@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
-import com.lukasstancikas.zedge_photos_details.core.common.navigation.PhotoDetailsDestination
+import com.lukasstancikas.zedge_photos_details.feature.photodetails.navigation.PhotoDetailsDestination
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

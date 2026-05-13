@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lukasstancikas.zedge_photos_details.core.common.navigation.PhotoDetailsDestination
-import com.lukasstancikas.zedge_photos_details.core.common.navigation.PhotoListDestination
+import com.lukasstancikas.zedge_photos_details.feature.photodetails.navigation.PhotoDetailsDestination
+import com.lukasstancikas.zedge_photos_details.feature.photolist.navigation.PhotoListDestination
 import com.lukasstancikas.zedge_photos_details.feature.photodetails.presentation.PhotoDetailsScreen
 import com.lukasstancikas.zedge_photos_details.feature.photolist.presentation.PhotoListScreen
 

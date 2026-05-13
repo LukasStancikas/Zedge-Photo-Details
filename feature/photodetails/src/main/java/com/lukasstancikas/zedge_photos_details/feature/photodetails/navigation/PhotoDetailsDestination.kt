@@ -1,9 +1,6 @@
-package com.lukasstancikas.zedge_photos_details.core.common.navigation
+package com.lukasstancikas.zedge_photos_details.feature.photodetails.navigation
 
 import kotlinx.serialization.Serializable
-
-@Serializable
-object PhotoListDestination
 
 @Serializable
 data class PhotoDetailsDestination(val photoId: String)
