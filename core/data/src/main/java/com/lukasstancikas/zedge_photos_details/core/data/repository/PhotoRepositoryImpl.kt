@@ -8,6 +8,7 @@ import com.lukasstancikas.zedge_photos_details.core.database.dao.PhotoDao
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import com.lukasstancikas.zedge_photos_details.core.network.PicsumApi
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -37,6 +38,9 @@ class PhotoRepositoryImpl @Inject constructor(
                     networkResult.data.map { it.toEntity() },
                 )
                 Loadable.Success(Unit)
+            } catch (e: CancellationException) {
+                // handle cancellation if needed, by remembering what was not stored
+                throw e
             } catch (e: Exception) {
                 e.printStackTrace()
                 Loadable.Error(e)
@@ -53,6 +57,8 @@ class PhotoRepositoryImpl @Inject constructor(
         } else {
             Loadable.Error(Exception("Photo not found"))
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Loadable.Error(e)
     }
