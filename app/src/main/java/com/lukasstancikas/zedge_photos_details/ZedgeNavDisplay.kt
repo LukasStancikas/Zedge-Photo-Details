@@ -2,8 +2,10 @@ package com.lukasstancikas.zedge_photos_details
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.lukasstancikas.zedge_photos_details.core.navigation.FeatureNavEntryProvider
 import com.lukasstancikas.zedge_photos_details.core.navigation.Navigator
@@ -24,5 +26,10 @@ fun ZedgeNavDisplay(navigationProviders: Set<FeatureNavEntryProvider>) {
                 }
             }
         },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            // This isolates the ViewModel lifecycle per back stack entry for PhotoDetailsScreen
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
 }

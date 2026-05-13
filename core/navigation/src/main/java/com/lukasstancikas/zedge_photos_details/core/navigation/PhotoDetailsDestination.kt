@@ -4,4 +4,4 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PhotoDetailsDestination(val photoId: String = "") : NavKey
+data class PhotoDetailsDestination(val photoId: String) : NavKey
