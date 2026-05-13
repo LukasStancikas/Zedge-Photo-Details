@@ -11,11 +11,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lukasstancikas.zedge_photos_details.core.common.showErrorToast
 import com.lukasstancikas.zedge_photos_details.core.ui.FullScreenScaffold
 import com.lukasstancikas.zedge_photos_details.core.ui.ReloadableContent
 import com.lukasstancikas.zedge_photos_details.feature.photolist.R
@@ -28,13 +26,11 @@ fun PhotoListScreen(
     viewModel: PhotoListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is PhotoListEffect.NavigateToDetails -> onNavigateToDetails(effect.photoId)
-                is PhotoListEffect.ShowErrorToast -> showErrorToast(context, effect.error)
             }
         }
     }

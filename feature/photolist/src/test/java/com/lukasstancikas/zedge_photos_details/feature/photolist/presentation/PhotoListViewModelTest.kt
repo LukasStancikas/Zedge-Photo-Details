@@ -2,6 +2,7 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.turbineScope
+import com.lukasstancikas.zedge_photos_details.core.common.message.MessageController
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
@@ -32,6 +33,7 @@ class PhotoListViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val repository: PhotoRepository = mock()
+    private val messageController: MessageController = mock()
     private lateinit var viewModel: PhotoListViewModel
 
     private val photosFlow = MutableStateFlow<List<Photo>>(emptyList())
@@ -56,7 +58,7 @@ class PhotoListViewModelTest {
         photosFlow.value = photos
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial State: Loading
@@ -80,7 +82,7 @@ class PhotoListViewModelTest {
         whenever(repository.loadMorePhotos()).thenReturn(Loadable.Error(Exception(errorMessage)))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial State: Loading
@@ -104,7 +106,7 @@ class PhotoListViewModelTest {
         whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial load
@@ -148,7 +150,7 @@ class PhotoListViewModelTest {
             whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
             photosFlow.value = photos
 
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
@@ -170,14 +172,13 @@ class PhotoListViewModelTest {
     }
 
     @Test
-    fun `load next page failure triggers ShowErrorToast effect`() = runTest {
+    fun `load next page failure calls messageController showErrorToast`() = runTest {
         whenever(repository.loadMorePhotos()).thenReturn(Loadable.Success(Unit))
             .thenReturn(Loadable.Error(Exception("Paging error")))
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
-            val effectTurbine = viewModel.effect.testIn(this)
             // Initial load
             val initialLoadingState = stateTurbine.awaitItem()
             assertEquals(Loadable.Loading, initialLoadingState.loadedState)
@@ -186,10 +187,6 @@ class PhotoListViewModelTest {
             assertTrue(initialSuccessState.loadedState is Loadable.Success)
 
             viewModel.action(PhotoListAction.LoadNextPage)
-            // Effect emitted on failure
-            val effect = effectTurbine.awaitItem()
-            assertTrue(effect is PhotoListEffect.ShowErrorToast)
-            assertEquals("Paging error", (effect as PhotoListEffect.ShowErrorToast).error)
 
             // Paging started (back to false)
             val nextPageLoadingState = stateTurbine.awaitItem()
@@ -197,8 +194,8 @@ class PhotoListViewModelTest {
             val nextPageLoadedState = stateTurbine.awaitItem()
             assertFalse(nextPageLoadedState.isNextPageLoading)
 
+            verify(messageController).showError("Paging error")
             stateTurbine.cancelAndIgnoreRemainingEvents()
-            effectTurbine.cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -213,7 +210,7 @@ class PhotoListViewModelTest {
         favoritePhotosFlow.value = favoritePhotos
 
         turbineScope {
-            viewModel = PhotoListViewModel(repository)
+            viewModel = PhotoListViewModel(repository, messageController)
             val stateTurbine = viewModel.uiState.testIn(this)
 
             // Initial Loading

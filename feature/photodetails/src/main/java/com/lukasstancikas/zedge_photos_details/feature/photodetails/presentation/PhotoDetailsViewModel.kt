@@ -2,17 +2,16 @@ package com.lukasstancikas.zedge_photos_details.feature.photodetails.presentatio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lukasstancikas.zedge_photos_details.core.common.sharing.ContentSharingController
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,6 +19,7 @@ import kotlinx.coroutines.launch
 class PhotoDetailsViewModel @AssistedInject constructor(
     @Assisted photoId: String,
     private val repository: PhotoRepository,
+    private val contentSharingController: ContentSharingController,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -29,9 +29,6 @@ class PhotoDetailsViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(PhotoDetailsUiState(photoId = photoId))
     val uiState: StateFlow<PhotoDetailsUiState> = _uiState.asStateFlow()
-
-    private val _effect = Channel<PhotoDetailsEffect>()
-    val effect = _effect.receiveAsFlow()
 
     init {
         loadPhoto()
@@ -72,8 +69,6 @@ class PhotoDetailsViewModel @AssistedInject constructor(
 
     private fun sharePhoto() {
         val currentPhoto = (uiState.value.photo as? Loadable.Success)?.data ?: return
-        viewModelScope.launch {
-            _effect.send(PhotoDetailsEffect.SharePhotoUrl(currentPhoto.downloadUrl))
-        }
+        contentSharingController.sharePhotoUrl(currentPhoto.downloadUrl)
     }
 }

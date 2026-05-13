@@ -9,20 +9,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
-import com.lukasstancikas.zedge_photos_details.core.common.sharePhotoUrl
 import com.lukasstancikas.zedge_photos_details.core.domain.model.Photo
 import com.lukasstancikas.zedge_photos_details.core.ui.FullScreenScaffold
 import com.lukasstancikas.zedge_photos_details.core.ui.LoadableContent
 import com.lukasstancikas.zedge_photos_details.feature.photodetails.R
-import kotlinx.coroutines.flow.collectLatest
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoDetailsScreen(
@@ -33,15 +28,6 @@ fun PhotoDetailsScreen(
     )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is PhotoDetailsEffect.SharePhotoUrl -> sharePhotoUrl(effect.url, context)
-            }
-        }
-    }
 
     FullScreenScaffold(
         title = stringResource(R.string.title_photo_details),

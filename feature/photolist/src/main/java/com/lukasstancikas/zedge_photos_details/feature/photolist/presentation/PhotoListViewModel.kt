@@ -2,6 +2,7 @@ package com.lukasstancikas.zedge_photos_details.feature.photolist.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lukasstancikas.zedge_photos_details.core.common.message.MessageController
 import com.lukasstancikas.zedge_photos_details.core.common.model.Loadable
 import com.lukasstancikas.zedge_photos_details.core.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
     private val repository: PhotoRepository,
+    private val messageController: MessageController,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PhotoListUiState())
@@ -116,11 +118,7 @@ class PhotoListViewModel @Inject constructor(
                     (_uiState.value.loadedState as? Loadable.Success)?.data?.photos.isNullOrEmpty()
 
                 if (!noCachedPhotos) {
-                    _effect.send(
-                        PhotoListEffect.ShowErrorToast(
-                            result.throwable.message.orEmpty(),
-                        ),
-                    )
+                    messageController.showError(result.throwable.message.orEmpty())
                 } else {
                     _uiState.update { it.copy(loadedState = result) }
                 }
@@ -137,11 +135,7 @@ class PhotoListViewModel @Inject constructor(
             _uiState.update { it.copy(isNextPageLoading = false) }
             if (result is Loadable.Error) {
                 // partial update show toast
-                _effect.send(
-                    PhotoListEffect.ShowErrorToast(
-                        result.throwable.message.orEmpty(),
-                    ),
-                )
+                messageController.showError(result.throwable.message.orEmpty())
             }
         }
     }
