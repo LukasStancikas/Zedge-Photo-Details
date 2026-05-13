@@ -37,3 +37,11 @@
   - Drop-down or dialog to select what to share, URL or raw photo data
   - Full screen display of image on click inside details with finger controls
   - Update all dependency versions
+
+## TODO
+- handle relevant dispatchers for io/main for db + network
+- don't clear items on refresh (or preserve favorite at least)
+- dynamic paging fetching from DB, maybe batch size will be different depending on screen size
+- load items not on last item seen but earlier (scroll position or earlier item seen, but trigger faster)
+- unstable parameters → direct viewmodel lambdas
+- Why Channel not SharedFlow for effect, how to avoid losing missed effects (store them until it is used)
